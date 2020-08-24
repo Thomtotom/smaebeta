@@ -6,14 +6,27 @@
 
         canvas {
             border: 1px solid #d3d3d3;
-            background-color: #f1f1f1;
+            background-color: #f1f1f1; 
         }
     </style>
 </head>
 <body onload="startGame()">
     <canvas id="canvas"></canvas>
     <button onclick="openFullscreen()">Fullscreen</button>
+    <p id="loading"></p>
     <script>
+        //array prototype clear fuunction for arrays
+
+        Array.prototype.czlear = function () {
+            var i;
+            for (i = 0; i < this.length; i++) {
+                this[i] = null;
+            }
+        };
+        var all = ["imgs/skyfall/fireball.png", "imgs/skyfall/coin.png", "imgs/playerandenemy/player.png", "imgs/playerandenemy/playerright.png", "imgs/playerandenemy/playerleft.png", "imgs/playerandenemy/playerdamaged.png", "imgs/playerandenemy/enemy.png", "imgs/playerandenemy/enemydamaged.png", "imgs/health/eighthhealth.png", "imgs/health/fiveeighthhealth.png", "imgs/health/threeeighthhealth.png", "imgs/health/seveneighthhealth.png", "imgs/health/quarterhealth.png", "imgs/health/threequarterhealth.png", "imgs/health/halfhealth.png", "imgs/health/fullhealth.png", "imgs/health/heart.png", "imgs/weapons/arrow.png", "imgs/weapons/woodensword.png", "imgs/weapons/stonesword.png", "imgs/weapons/woodenbow.png", "backgrounds/inventory.png", "backgrounds/l4.png", "backgrounds/level3chest+d.png", "backgrounds/templeback2wd.png", "backgrounds/templeback1description.png", "backgrounds/templeback2nowb.png", "backgrounds/templeback2nowbwd.png", "backgrounds/templeback2wb.png", "backgrounds/skyfallback.png", "backgrounds/level3chest.png", "backgrounds/templeback.png"];
+
+        var l4 = false;
+        var l5 = false;
         //checks whehter inventory open
         var invopen = true;
         //arrow stuff
@@ -21,7 +34,7 @@
         var arrowinflight = false;
         var arrow;
         var arrowcounter;
-        var arrows = 10;
+        var arrows = 100;
         var arrowlaunchroom;
         //xmin, ymin, xmax, ymax
         var arrowhits = [];
@@ -30,22 +43,24 @@
         var activeweapon = 0;
         var activecounter = 0;
         //png lists
-        var bowpngs = ["", "woodenbow.png"];
-        var swordpngs = ["", "woodensword.png", "stonesword.png"];
+        var bowpngs = ["", "imgs/weapons/woodenbow.png"];
+        var swordpngs = ["", "imgs/weapons/woodensword.png", "imgs/weapons/stonesword.png"];
 
         // item lists
-        var swords = ["None","Wooden Sword 1"];
-        var bows = ["None","Wooden Bow 1"]
+        var swords = ["None", "Wooden Sword 1"];
+        var bows = ["None", "Wooden Bow 1"]
         var helmets = ["None"];
-        var tools  = ["None"];
+        var tools = ["None"];
         var items = ["None"];
         var chestplates = ["None"];
         var throws = ["None"];
         //trackers
+        var sworddmgs = [0, 1, 2];
 
-        var itemindex = [0,1,1,0,0,0,0];
-        var equipped = ["None","Wooden Sword 1","Wooden Bow 1","None","None","None","None","None"];
-        var counts = [0,0,0,0,0,0,0];
+
+        var itemindex = [0, 1, 1, 0, 0, 0, 0];
+        var equipped = ["None", "Wooden Sword 1", "Wooden Bow 1", "None", "None", "None", "None", "None"];
+        var counts = [0, 0, 0, 0, 0, 0, 0];
         //popup text
         var text = "";
         //chest check
@@ -59,6 +74,8 @@
         var sword;
         var bow;
         var enemies = [];
+        var enemyhealth = [];
+        var enemydarts = [];
         //Skyfall play function 
         function play() {
             //reset score
@@ -78,7 +95,7 @@
             myCoin.y = 93;
             // focus canvas
             myGamearea.canvas.focus;
-           
+
         }
         //level/room/area/whatever
         var level = 1;
@@ -86,27 +103,33 @@
         //function that starts game
         function startGame() {
             //set components
-             sword = new component(240,30,"woodensword.png",0,0,"image");
-             sword.angle = Math.PI/-2;
-             arrow = new component(150,7.5,"arrow.png",0,0,"image");
-             bow  = new component(120,60,"woodenbow.png",0,0,"image")
-             myObstacle1 = new component(60, 60, "fireball.png", 0, 0, "image");
+            sword = new component(240, 30, "imgs/weapons/woodensword.png", 0, 0, "image");
+            sword.angle = Math.PI / -2;
+            arrow = new component(150, 7.5, "imgs/weapons/arrow.png", 0, 0, "image");
+            bow = new component(120, 60, "imgs/weapons/woodenbow.png", 0, 0, "image")
+            myObstacle1 = new component(60, 60, "imgs/skyfall/fireball.png", 0, 0, "image");
 
-                        myObstacle2 = new component(60, 60, "fireball.png", 0, 0, "image");
-                        myObstacle3 = new component(60, 60, "fireball.png", 0, 0, "image");
-                        myObstacle4 = new component(60, 60, "fireball.png", 0, 0, "image");
-                        myObstacle5 = new component(60, 60, "fireball.png", 0, 0, "image");
+            myObstacle2 = new component(60, 60, "imgs/skyfall/fireball.png", 0, 0, "image");
+            myObstacle3 = new component(60, 60, "imgs/skyfall/fireball.png", 0, 0, "image");
+            myObstacle4 = new component(60, 60, "imgs/skyfall/fireball.png", 0, 0, "image");
+            myObstacle5 = new component(60, 60, "imgs/skyfall/fireball.png", 0, 0, "image");
 
-            myCoin = new component(60, 60, "coin.png", 0, 0, "image");
+            myCoin = new component(60, 60, "imgs/skyfall/coin.png", 0, 0, "image");
 
-            myGamePiece = new component(60, 60, "player.png", 160, 440, "image");
-
+            myGamePiece = new component(60, 60, "imgs/playerandenemy/player.png", 160, 440, "image");
+            myGamePiece.health = 10;
             //start 
             myGameArea.start();
 
         }
+        function drawallimgs() {
+            for (var f = 0; f < all.length; f++) {
+                var k = new Image();
+                k.src = all[f];
+                myGameArea.context.drawImage(k, 0, 0, 960, 540)
+            }
 
-
+        }
         //sort of global var: controls everything. 
         var myGameArea = {
             //canvas
@@ -117,6 +140,7 @@
                 this.canvas.width = 960;
                 this.canvas.height = 540;
                 this.context = this.canvas.getContext("2d");
+                drawallimgs();
                 //update game
                 this.interval = setInterval(updateGameArea, 20);
                 //detect key press 
@@ -132,6 +156,12 @@
                     myGameArea.x = e.pageX;
                     myGameArea.y = e.pageY;
                 })
+                window.addEventListener('mousedown', function (e) {
+                    myGameArea.click = true;
+                })
+                window.addEventListener('mouseup', function (e) {
+                    myGameArea.click = false;
+                })
             },
             //stop function(unused)
             stop: function () {
@@ -144,30 +174,31 @@
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             }
         }
-        //fullscreen
-                var elem;
+        //fullscreen 
+        var elem;
         elem = myGameArea.canvas;
 
         function openFullscreen() {
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { /* Firefox */
-    elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE/Edge */
-    elem.msRequestFullscreen();
-  }
-}
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+        }
         //This is the component constructor. It creates movable objects. 
         function component(width, height, color, x, y, type) {
             //image check
-                this.type = type;
-                if (this.type == "image") {
-                    this.image = new Image();
-                    this.image.src = color;
-                }
+            this.type = type;
+            if (this.type == "image") {
+                this.image = new Image();
+                this.image.src = color;
+            }
             //presets
+
             this.angle = 0;
             this.width = width;
             this.height = height;
@@ -177,27 +208,35 @@
             this.speedY = 0;
             this.gravity = 0.05;
             this.gravitySpeed = 0;
-            //my addition, also a preset
+            //my addition, also presets
             this.dir = "l";
+            this.health = 3;
+            this.origh = 3;
+            this.kb = 0;
+            this.kbd = 0;
+            this.dropgold = 0;
+            this.spawnroom = 1;
+            this.inflight = false;
+            this.loadcount = 0;
             //update function, draws component when called on: rotate, translate and restore are part of rotatable components. 
             this.update = function () {
-                 ctx = myGameArea.context;
-                 if (type == "image") {
-                     ctx.save();
-                     ctx.translate(this.x, this.y);
-                     ctx.rotate(this.angle);
-                     ctx.drawImage(this.image,
-                     this.width / -2, this.height / -2,
-                     this.width, this.height);
-                     ctx.restore(); 
-                 } else {
+                ctx = myGameArea.context;
+                if (type == "image") {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle);
+                    ctx.drawImage(this.image,
+                        this.width / -2, this.height / -2,
+                        this.width, this.height);
+                    ctx.restore();
+                } else {
                     ctx.save();
                     ctx.translate(this.x, this.y);
                     ctx.rotate(this.angle);
                     ctx.fillStyle = color;
                     ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
-                    ctx.restore(); 
-                 }
+                    ctx.restore();
+                }
             }
             //moves  
             this.newPos = function () {
@@ -227,9 +266,9 @@
         }
         //key check function
         function keycheck() {
-            if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -4; myGamePiece.dir = "l"; myGamePiece.image.src = "playerleft.png";}
-            else if (myGameArea.keys && myGameArea.keys[39]) { myGamePiece.speedX = 4;  myGamePiece.dir = "r"; myGamePiece.image.src = "playerright.png";} 
-            
+            if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -4; myGamePiece.dir = "l"; myGamePiece.image.src = "imgs/playerandenemy/playerleft.png"; }
+            else if (myGameArea.keys && myGameArea.keys[39]) { myGamePiece.speedX = 4; myGamePiece.dir = "r"; myGamePiece.image.src = "imgs/playerandenemy/playerright.png"; }
+
         }
 
         //collide with platforms
@@ -248,13 +287,13 @@
                 myGamePiece.x = xdraw - 30;
             }
 
-            if (myGamePiece.x >= xdraw2 + 10 && myGamePiece.x <= xdraw2 +30 && myGamePiece.y < ydraw + 30 && myGamePiece.y > ydraw - 30) {
+            if (myGamePiece.x >= xdraw2 + 10 && myGamePiece.x <= xdraw2 + 30 && myGamePiece.y < ydraw + 30 && myGamePiece.y > ydraw - 30) {
                 myGamePiece.x = xdraw2 + 30;
             }
         }
         //and walls
         function wallcollide(xdraw, ydraw, ydraw2) {
-            if (myGamePiece.x >= xdraw - 50 && myGamePiece.x <= xdraw - 30 && myGamePiece.y > ydraw - 10 && myGamePiece.y < ydraw2 +30) {
+            if (myGamePiece.x >= xdraw - 50 && myGamePiece.x <= xdraw - 30 && myGamePiece.y > ydraw - 10 && myGamePiece.y < ydraw2 + 30) {
                 myGamePiece.x = xdraw - 50;
             }
 
@@ -270,18 +309,18 @@
         }
         //go through doors  
         function generalwall() {
-            
+
             if (myGamePiece.x >= 930) {
                 myGamePiece.x = 90;
-                
+
                 level += 1;
-                    
+
             }
             if (myGamePiece.x <= 30) {
                 myGamePiece.x = 870;
                 level -= 1;
             }
-                
+
         }
         //collide with lava/whatever is bad 
         function badcollidehori(x1, x2, y) {
@@ -305,13 +344,13 @@
             }
         }
         function bouncecollide(x1, x2, y) {
-            if (myGamePiece.x >= x1 - 30 && myGamePiece.x <= x2  +30 && myGamePiece.y >= y - 50 && myGamePiece.y <= y + 50) {
+            if (myGamePiece.x >= x1 - 30 && myGamePiece.x <= x2 + 30 && myGamePiece.y >= y - 50 && myGamePiece.y <= y + 50) {
                 accelerate(-6.5);
             }
         }
-        
+
         //should be false, hacked because I don't want to beat it every time
-        var skyfallbeaten = true;
+        var skyfallbeaten = false;
         //update function   
         function updateGameArea() {
             //clear, stop player  
@@ -320,11 +359,13 @@
             //physics mechanism for each level
             if (level == 1) {
                 //check keys l/r  
+
                 keycheck();
                 //jump
                 if (myGameArea.keys && myGameArea.keys[38]) {
                     //only if touching bottom
                     if (myGamePiece.y >= 448) {
+
                         //jump
                         accelerate(-5);
                     } else {
@@ -338,20 +379,20 @@
                 //move between levels
                 generalwall();
                 //walls   
-                wallcollide(42,0,358);
-                platformcollide(0,62,338);
-                wallcollide(918,0,358);
-                platformcollide(898,960,338);
+                wallcollide(42, 0, 358);
+                platformcollide(0, 62, 338);
+                wallcollide(918, 0, 358);
+                platformcollide(898, 960, 338);
                 //background
-                bg("templeback.png");
+                bg("backgrounds/templeback.png");
                 //sign
                 if (myGamePiece.x >= 402 && myGamePiece.x <= 582 && myGamePiece.y >= 332) {
-                   if (myGameArea.keys && (myGameArea.keys[101]||myGameArea.keys[69])) {
-                       bg("templeback1description.png");
-                       
-                   }
-                } 
-                
+                    if (myGameArea.keys && (myGameArea.keys[101] || myGameArea.keys[69])) {
+                        bg("backgrounds/templeback1description.png");
+
+                    }
+                }
+
             }
             if (level == 2) {
 
@@ -377,162 +418,162 @@
                 //move between levels
                 generalwall();
                 //left wall
-                wallcollide(42,0,358);
-                platformcollide(0,62,338);
-                
+                wallcollide(42, 0, 358);
+                platformcollide(0, 62, 338);
+
                 //background
-               bg("templeback2wb.png");
-                
-                if(skyfallbeaten == true){
+                bg("backgrounds/templeback2wb.png");
+
+                if (skyfallbeaten == true) {
                     //allow movement left + show background
-                 wallcollide(918,0,358);
-                platformcollide(898,960,338);
-                    bg("templeback2nowb.png");
+                    wallcollide(918, 0, 358);
+                    platformcollide(898, 960, 338);
+                    bg("backgrounds/templeback2nowb.png");
                 } else {
                     //one big wall left
-                wallcollide(918,0,540);
+                    wallcollide(918, 0, 540);
                 }
                 //sign
                 if (myGamePiece.y >= 402 && myGamePiece.x <= 316 && myGamePiece.x >= 134) {
-                   if (myGameArea.keys && (myGameArea.keys[101]||myGameArea.keys[69])) {
-                       
-                       if(skyfallbeaten == true){
-                           bg("templeback2nowbwd.png");
-                           
-                       } else {
-                       bg("templeback2wd.png");
-                       }
-                   }
+                    if (myGameArea.keys && (myGameArea.keys[101] || myGameArea.keys[69])) {
+
+                        if (skyfallbeaten == true) {
+                            bg("backgrounds/templeback2nowbwd.png");
+
+                        } else {
+                            bg("backgrounds/templeback2wd.png");
+                        }
+                    }
                 }
                 //door
                 if (myGamePiece.x >= 390 && myGamePiece.x <= 548 && myGamePiece.y >= 300) {
                     if (myGameArea.keys && (myGameArea.keys[101] || myGameArea.keys[69])) {
-                    level = 2.5;
+                        level = 2.5;
                         play();
                         console.log("schmetterlink!!")
                     }
                 }
-                
-                
+
+
             }
             //skyfall
             if (level == 2.5 && !invopen) {
                 //background
-                 bg("skyfallback.png");
+                bg("backgrounds/skyfallback.png");
                 //reset values
                 myGamePiece.speedX = 0;
-            myGamePiece.speedY = 0;
+                myGamePiece.speedY = 0;
                 //keycheck
-            if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -4; }
-            if (myGameArea.keys && myGameArea.keys[39]) { myGamePiece.speedX = 4; }
-// move obstacles
-            if (myObstacle1.y >= 430) {
-                myObstacle1.x = (Math.random() * 776) + 92;
-                myObstacle1.y = (Math.random() * 40) + 92;
-            }
-            myObstacle2.y += ((Math.random() * 3) + 1 + score / 100) * 2;
-            if (myObstacle2.y >= 430) {
-                myObstacle2.x = (Math.random() * 776)+92;
-                myObstacle2.y = (Math.random() * 40) + 92;
-            }
-            myObstacle3.y += ((Math.random() * 3) + 1 + score / 100 )*2;
-            if (myObstacle3.y >= 430) {
-                myObstacle3.x = (Math.random() * 776)+92;
-                myObstacle3.y = (Math.random() * 40) + 92;
-            }
-            myObstacle4.y += ((Math.random() * 3) + 1 + score / 100)*2;
-            if (myObstacle4.y >= 430) {
-                myObstacle4.x = (Math.random() * 776)+92;
-                myObstacle4.y = (Math.random() * 40) + 92;
-            }
-            myObstacle5.y += ((Math.random() * 3) + 1 + score / 100)*2;
-            if (myObstacle5.y >= 430) {
-                myObstacle5.x = (Math.random() * 776)+92;
-                myObstacle5.y = (Math.random() * 40) + 92;
-            }
-            if (myCoin.y >= 430) {
-                myCoin.x = (Math.random() * 776)+92;
-                myCoin.y = (Math.random() * 40) + 92;
-            }
-            myCoin.y += ((Math.random() * 3) + 1 + score / 100)*2;
-
-            myObstacle1.y += ((Math.random() * 3) + 1 + score / 100)*2;
-                //check obstacle collisions
-            if (Math.abs(myGamePiece.x - myObstacle1.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myObstacle1.y) <= 60) {
-                    myGameArea.clear();
-                    level = 2;
-                    myGamePiece.x=430;
+                if (myGameArea.keys && myGameArea.keys[37]) { myGamePiece.speedX = -8; }
+                if (myGameArea.keys && myGameArea.keys[39]) { myGamePiece.speedX = 8; }
+                // move obstacles
+                if (myObstacle1.y >= 430) {
+                    myObstacle1.x = (Math.random() * 776) + 92;
+                    myObstacle1.y = (Math.random() * 40) + 92;
                 }
-            }
-            if (Math.abs(myGamePiece.x - myObstacle3.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myObstacle3.y) <= 60) {
-                    myGameArea.clear();
-                    level = 2;
-                    myGamePiece.x=430;
+                myObstacle2.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+                if (myObstacle2.y >= 430) {
+                    myObstacle2.x = (Math.random() * 776) + 92;
+                    myObstacle2.y = (Math.random() * 40) + 92;
                 }
-            }
-            if (Math.abs(myGamePiece.x - myObstacle2.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myObstacle2.y) <= 60) {
-                    myGameArea.clear();
-                    level = 2;
-                    myGamePiece.x=430;
+                myObstacle3.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+                if (myObstacle3.y >= 430) {
+                    myObstacle3.x = (Math.random() * 776) + 92;
+                    myObstacle3.y = (Math.random() * 40) + 92;
                 }
-            }
-            if (Math.abs(myGamePiece.x - myObstacle4.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myObstacle4.y) <= 60) {
-                    myGameArea.clear();
-                    level = 2;
-                    myGamePiece.x=430;
+                myObstacle4.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+                if (myObstacle4.y >= 430) {
+                    myObstacle4.x = (Math.random() * 776) + 92;
+                    myObstacle4.y = (Math.random() * 40) + 92;
                 }
-            }
-            if (Math.abs(myGamePiece.x - myObstacle5.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myObstacle5.y) <= 60) {
-                    myGameArea.clear();
-                    level = 2;
-                    myGamePiece.x=430;
+                myObstacle5.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+                if (myObstacle5.y >= 430) {
+                    myObstacle5.x = (Math.random() * 776) + 92;
+                    myObstacle5.y = (Math.random() * 40) + 92;
                 }
-            }
-            if (Math.abs(myGamePiece.x - myCoin.x) <= 60) {
-                if (Math.abs(myGamePiece.y - myCoin.y) <= 60) {
+                if (myCoin.y >= 430) {
                     myCoin.x = (Math.random() * 776) + 92;
                     myCoin.y = (Math.random() * 40) + 92;
-                    score += 1;
-
                 }
-            }//update obstacles + coin
-            myObstacle1.update();
-            myObstacle2.update();
-            myObstacle3.update();
-            myObstacle4.update();
-            myObstacle5.update();
-            myCoin.update();
-            
-            //stop from going through walls
-            myGamePiece.newPos();
-            if (myGamePiece.x <= 92) {
-                myGamePiece.x = 92;
-            }
-            if (myGamePiece.x >= 868) {
-                myGamePiece.x = 868;
-            }
+                myCoin.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+
+                myObstacle1.y += ((Math.random() * 3) + 1 + score / 100) * 2;
+                //check obstacle collisions
+                if (Math.abs(myGamePiece.x - myObstacle1.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myObstacle1.y) <= 60) {
+                        myGameArea.clear();
+                        level = 2;
+                        myGamePiece.x = 430;
+                    }
+                }
+                if (Math.abs(myGamePiece.x - myObstacle3.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myObstacle3.y) <= 60) {
+                        myGameArea.clear();
+                        level = 2;
+                        myGamePiece.x = 430;
+                    }
+                }
+                if (Math.abs(myGamePiece.x - myObstacle2.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myObstacle2.y) <= 60) {
+                        myGameArea.clear();
+                        level = 2;
+                        myGamePiece.x = 430;
+                    }
+                }
+                if (Math.abs(myGamePiece.x - myObstacle4.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myObstacle4.y) <= 60) {
+                        myGameArea.clear();
+                        level = 2;
+                        myGamePiece.x = 430;
+                    }
+                }
+                if (Math.abs(myGamePiece.x - myObstacle5.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myObstacle5.y) <= 60) {
+                        myGameArea.clear();
+                        level = 2;
+                        myGamePiece.x = 430;
+                    }
+                }
+                if (Math.abs(myGamePiece.x - myCoin.x) <= 60) {
+                    if (Math.abs(myGamePiece.y - myCoin.y) <= 60) {
+                        myCoin.x = (Math.random() * 776) + 92;
+                        myCoin.y = (Math.random() * 40) + 92;
+                        score += 1;
+
+                    }
+                }//update obstacles + coin
+                myObstacle1.update();
+                myObstacle2.update();
+                myObstacle3.update();
+                myObstacle4.update();
+                myObstacle5.update();
+                myCoin.update();
+
+                //stop from going through walls
+                myGamePiece.newPos();
+                if (myGamePiece.x <= 92) {
+                    myGamePiece.x = 92;
+                }
+                if (myGamePiece.x >= 868) {
+                    myGamePiece.x = 868;
+                }
                 //update gamepiece
-            myGamePiece.update();
+                myGamePiece.update();
                 //draw score, monitor if beaten
-            var clx = myGameArea.context;
-                
+                var clx = myGameArea.context;
+
                 clx.font = "60px Arial"
                 clx.fillStyle = "black"
                 clx.fillText("Score: " + score, 20, 50)
                 if (score >= 10) {
                     level = 2;
                     skyfallbeaten = true;
-                    myGamePiece.x=430;
+                    myGamePiece.x = 430;
                     textpuff("Beaten skyfall, +10  coins")
                     coins += 10;
-                    setTimeout(textpuff,10000,"")
+                    setTimeout(textpuff, 10000, "")
                 }
-               
+
             }
             if (level == 3) {
                 //key check l/r
@@ -555,42 +596,231 @@
                 // move throuugh levels
                 generalwall();
                 //walls
-                wallcollide(42,0,358);
-                platformcollide(0,62,338);
-                wallcollide(918,0,358);
-                platformcollide(898,960,338);
+                wallcollide(42, 0, 358);
+                platformcollide(0, 62, 338);
+                wallcollide(918, 0, 358);
+                platformcollide(898, 960, 338);
                 //background
-                bg("level3chest.png")
+                bg("backgrounds/level3chest.png")
                 //sign
-               if (myGamePiece.x >= 182 && myGamePiece.x <= 372 && myGamePiece.y >= 328) {
-                   if (myGameArea.keys && (myGameArea.keys[101]||myGameArea.keys[69])) {
-                       bg("level3chest+d.png");
-                   }
+                if (myGamePiece.x >= 182 && myGamePiece.x <= 372 && myGamePiece.y >= 328) {
+                    if (myGameArea.keys && (myGameArea.keys[101] || myGameArea.keys[69])) {
+                        bg("backgrounds/level3chest+d.png");
+                    }
                 }
                 //chest      
                 if (myGamePiece.x >= 402 && myGamePiece.x <= 582 && myGamePiece.y >= 332) {
-                   if (myGameArea.keys && (myGameArea.keys[101]||myGameArea.keys[69])) {
-                       //if chest not already empty
-                       if(chest1con == 1){
-                           //add stuff
-                       inv.push("Stone Sword MW 2")
-                       swords.push("Stone Sword 2")
-                       coins += 25;
-                           chest1con = 0;
-                           textpuff("Looted 'Stone Sword MW 2' and '25 coins'");
-                          setTimeout(textpuff,10000,"");
-                           console.log(text);
+                    if (myGameArea.keys && (myGameArea.keys[101] || myGameArea.keys[69])) {
+                        //if chest not already empty
+                        if (chest1con == 1) {
+                            //add stuff
+                            inv.push("Stone Sword MW 2")
+                            swords.push("Stone Sword 2")
+                            coins += 25;
+                            chest1con = 0;
+                            textpuff("Looted 'Stone Sword MW 2' and '25 coins'");
+                            setTimeout(textpuff, 10000, "");
+                            console.log(text);
 
-                       }
+                        }
 
 
-                   }
+                    }
                 }
             }
-           
-            if(level == Math.floor(level)){
-            //Z, change weapon. Note: this updates 50 times per second, so toggleable things are complicated. I have fixed this by waiting for 20 iterations (0.4 seconds) before it changes. 
-            if (myGameArea.keys && (myGameArea.keys[122] || myGameArea.keys[90])) {
+
+            if (level == 4) {
+
+                //key check l/r
+                keycheck();
+                //jump
+                if (myGameArea.keys && myGameArea.keys[38]) {
+                    //only if touching bottom
+                    if (myGamePiece.y >= 448) {
+                        //jump
+                        accelerate(-5);
+                    } else {
+                        //gravity  
+                        accelerate(0.1)
+
+                    }
+                } else {
+                    //gravity 
+                    accelerate(0.1)
+                }
+                // move throuugh levels
+                generalwall();
+                //walls
+                wallcollide(42, 0, 358);
+                platformcollide(0, 62, 338);
+                wallcollide(918, 0, 358);
+                platformcollide(898, 960, 338);
+                //background
+                bg("backgrounds/l4.png");
+                if (!invopen) {
+                    if (!l4) {
+                        enemies[0] = new component(60, 60, "imgs/playerandenemy/enemy.png", 330, 448, "image");
+                        enemyhealth[0] = new component(60, 10, "imgs/health/fullhealth.png", 330, 408, "image");
+                        enemies[0].speedX = 4;
+                        enemies[0].health = 8;
+                        enemies[0].origh = 8;
+                        enemies[0].dropgold = 5;
+                        enemies[0].spawnroom = 4;
+                    }
+                    if (enemies[0].x >= 800) {
+                        enemies[0].speedX = -4;
+
+                    } else if (enemies[0].x <= 200) {
+                        enemies[0].speedX = 4;
+                    }
+
+
+                    if (myGamePiece.kb > 0) {
+                        myGamePiece.x += (1.1 ** myGamePiece.kb) * 25 / (1.1 ** 12) * myGamePiece.kbd;
+                        myGamePiece.kb -= 1;
+                        if (myGamePiece.kb > 1) {
+                            myGamePiece.image.src = "imgs/playerandenemy/playerdamaged.png";
+                        } else {
+                            myGamePiece.image.src = "imgs/playerandenemy/player.png";
+                        }
+                    }
+
+
+
+
+                    l4 = true;
+                }
+            }
+
+            if (level == 5) {
+
+                //key check l/r
+                keycheck();
+                //jump
+                if (myGameArea.keys && myGameArea.keys[38]) {
+                    //only if touching bottom
+                    if (myGamePiece.y >= 448) {
+                        //jump
+                        accelerate(-5);
+                    } else {
+                        //gravity  
+                        accelerate(0.1)
+
+                    }
+                } else {
+                    //gravity 
+                    accelerate(0.1)
+                }
+                // move throuugh levels
+                generalwall();
+                //walls
+                wallcollide(42, 0, 358);
+                platformcollide(0, 62, 338);
+                wallcollide(918, 0, 358);
+                platformcollide(898, 960, 338);
+                //background
+                bg("backgrounds/l4.png");
+                if (!invopen) {
+                    if (!l5) {
+                        enemies[1] = new component(60, 60, "imgs/playerandenemy/enemy.png", 660, 448, "image");
+                        enemyhealth[1] = new component(60, 10, "imgs/health/fullhealth.png", 660, 408, "image");
+                        enemydarts[1] = new component(150, 20, "imgs/weapons/dart.png", 660, 448, "image")
+                        enemies[1].speedX = 0;
+                        enemydarts[1].spawnroom = 5;
+                        enemies[1].health = 10;
+                        enemies[1].origh = 10;
+                        enemies[1].dropgold = 5;
+                        enemies[1].spawnroom = 5;
+                    }
+
+
+                    if (myGamePiece.kb > 0) {
+                        myGamePiece.x += (1.1 ** myGamePiece.kb) * 25 / (1.1 ** 12) * myGamePiece.kbd;
+                        myGamePiece.kb -= 1;
+                        if (myGamePiece.kb > 1) {
+                            myGamePiece.image.src = "imgs/playerandenemy/playerdamaged.png";
+                        } else {
+                            myGamePiece.image.src = "imgs/playerandenemy/player.png";
+                        }
+                    }
+
+
+
+
+                    l5 = true;
+                }
+            }
+
+            for (var i = 0; i < enemies.length; i++) {
+                if (enemies[i].health > 0 && enemies[i].spawnroom == level) {
+                    if (enemies[i].health <= enemies[i].origh / 8) {
+                        enemyhealth[i].image.src = "imgs/health/eighthhealth.png";
+                    }
+                    if (enemies[i].health <= enemies[i].origh / 4 && enemies[i].health > enemies[i].origh / 8) {
+                        enemyhealth[i].image.src = "imgs/health/quarterhealth.png";
+                    }
+                    if (enemies[i].health <= 3 * enemies[i].origh / 8 && enemies[i].health > enemies[i].origh / 4) {
+                        enemyhealth[i].image.src = "imgs/health/threeeighthhealth.png";
+                    }
+                    if (enemies[i].health <= enemies[i].origh / 2 && enemies[i].health > 3 * enemies[i].origh / 8) {
+                        enemyhealth[i].image.src = "imgs/health/halfhealth.png";
+                    }
+                    if (enemies[i].health <= 5 * enemies[i].origh / 8 && enemies[i].health > enemies[i].origh / 2) {
+                        enemyhealth[i].image.src = "imgs/health/fiveeighthhealth.png";
+                    }
+                    if (enemies[i].health <= 3 * enemies[i].origh / 4 && enemies[i].health > 5 * enemies[i].origh / 8) {
+                        enemyhealth[i].image.src = "imgs/health/threequarterhealth.png";
+                    }
+                    if (enemies[i].health <= 7 * enemies[i].origh / 8 && enemies[i].health > 3 * enemies[i].origh / 4) {
+                        enemyhealth[i].image.src = "imgs/health/seveneighthhealth.png";
+                    }
+                    if (enemies[i].health <= enemies[i].origh && enemies[i].health > 7 * enemies[i].origh / 8) {
+                        enemyhealth[i].image.src = "imgs/health/fullhealth.png";
+                    }
+                    if (enemydarts[i]) {
+                        if (enemydarts[i].inflight) {
+                            enemydarts[i].x += (Math.sin(enemydarts[i].angle + Math.PI / 2)) * 5;
+                            enemydarts[i].y += -5 * (Math.cos(enemydarts[i].angle + Math.PI / 2));
+                            //aim
+
+                            //when hits ground, stop flying
+
+                            if (enemydarts[i].y + 75 * Math.cos(enemydarts[i].angle - Math.PI / 2) >= myGamePiece.y - 30 && enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2) <= myGamePiece.x + 30 && enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2) >= myGamePiece.x - 30) {
+                                myGamePiece.health -= 1;
+                                myGamePiece.kb = 12;
+                                if (enemydarts[i].x > myGamePiece.x) {
+                                    myGamePiece.kbd = -1;
+                                } else {
+                                    myGamePiece.kbd = 1;
+                                }
+                                enemydarts[i].inflight = false;
+
+                            }
+
+                            if (enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2) >= 898 || enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2) <= 62 || enemydarts[i].y + 75 * Math.cos(enemydarts[i].angle - Math.PI / 2) <= 62 || enemydarts[i].y + 75 * Math.cos(enemydarts[i].angle - Math.PI / 2) >= 478 || enemydarts[i].spawnroom != level) {
+                                enemydarts[i].inflight = false;
+                                console.log(enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2), enemydarts[i].x - 75 * Math.sin(enemydarts[i].angle - Math.PI / 2))
+                            }
+                        } else {
+                            enemydarts[i].angle = Math.atan2((myGamePiece.y - enemies[i].y), (myGamePiece.x - enemies[i].x));
+                            enemydarts[i].inflight = true;
+                            enemydarts[i].x = enemies[i].x;
+                            enemydarts[i].y = enemies[i].y;
+                        }
+                        enemydarts[i].update();
+                    }
+                    enemies[i].newPos();
+                    enemyhealth[i].x = enemies[i].x;
+                    enemyhealth[i].y = enemies[i].y - 40;
+                    enemies[i].update();
+                    enemyhealth[i].update();
+
+                }
+            }
+
+            if (level == Math.floor(level)) {
+                //Z, change weapon. Note: this updates 50 times per second, so toggleable things are complicated. I have fixed this by waiting for 20 iterations (0.4 seconds) before it changes. 
+                if (myGameArea.keys && (myGameArea.keys[122] || myGameArea.keys[90])) {
                     console.log("2")
                     activecounter += 1;
                     if (activecounter >= 20) {
@@ -601,168 +831,275 @@
                         }
                     }
                 }
-            //text
-            var cx = myGameArea.context;
-            cx.fillStyle = "white";
-            cx.font = "30px Arial";
-            cx.fillText(text,240,30);
-            //update bow
 
-            bow.x = myGamePiece.x;
-            bow.y = myGamePiece.y;
-            //point towards mouse
-            bow.angle = Math.atan2(-(myGamePiece.y - myGameArea.y), -(myGamePiece.x - myGameArea.x));
-            //if arrow not in flight, move  arrow to player and move with bow
-            if (!arrowinflight && arrows >= 1) {
-                arrow.x = myGamePiece.x;
-                arrow.y = myGamePiece.y;
-                arrow.angle = bow.angle;
-            }
-            //if bow active weapon 
-            if (activeweapon == 1 ) {
-                
-                bow.update();
-                //if you have arrows
-                if(arrows >= 1|| (arrowinflight && arrows == 0)){
-                    arrow.update();
-                }
-            }
-                            //SPACE pressed, use weapon      
-                            if (myGameArea.keys && myGameArea.keys[32] && !invopen) {
-                                //sword
-                                if(activeweapon == 0){
-                                    //set image, go to player  
-                                sword.image.src = swordpngs[itemindex[1]];
-                                sword.x = myGamePiece.x;
-                                sword.y = myGamePiece.y;
-                                    //if right swing right    
-                                    if(myGamePiece.dir == "r"){
-                                    sword.angle += Math.PI/36;
-                                        if (sword.angle >= 0) {
-                                            sword.angle = Math.PI / -2;
-                                        }
-                                    }
-                                   //if left swing left        
-                                if(myGamePiece.dir == "l"){
-                                    sword.angle -= Math.PI/36;
-                                        if (sword.angle <= -1*Math.PI) {
-                                            sword.angle = Math.PI / -2;
-                                        }
-                                    }
-                                sword.update();
-                                    }
-                                //bow  
-                                if (activeweapon == 1 && !arrowinflight && arrows >= 1) {
-                                    //set original angle, show in flight, reset time, -1 arrows. 
-                                    arrowangle = arrow.angle;
-                                    arrowinflight = true;
-                                    arrowcounter = 0;
-                                    arrows -= 1;
-                                    arrowlaunchroom = level;
-                                }
-                               
-                            }
-            
-            if (arrowinflight && !invopen) {
-                //count time, used for quadratic flight path  
-                arrowcounter += 0.02;
-                //move along horizontally
-                arrow.x += (Math.sin(arrowangle + Math.PI/2)) * 10;
-                //move vertically, then subtract time in air 
-                arrow.y += -10*(Math.cos(arrowangle + Math.PI/2)) + 10*(arrowcounter ** 2);
-                //aim  
-                arrow.angle = Math.atan2(-10*(Math.cos(arrowangle + Math.PI/2)) + 10*(arrowcounter ** 2),(Math.sin(arrowangle + Math.PI/2)) * 10)
-                //when hits ground, stop flying
-                arrowhits[0]= arrow.x;
-                arrowhits[1]= arrow.y;
-                arrowhits[2]= arrow.x - 75 * Math.sin(arrow.angle - Math.PI/2);
-                arrowhits[3]= arrow.y + 75 * Math.cos(arrow.angle - Math.PI/2);
-                console.log(arrowlaunchroom,level)
-                if (arrowhits[2] >= 898 || arrowhits[3] <= 62 || arrowhits[2] <= 62 || arrowhits[3] >= 478 || arrowlaunchroom != level) {
-                    arrowinflight = false;
-                }
-                
-            }
-            //inventory open
-            if (myGameArea.keys && (myGameArea.keys[114] || myGameArea.keys[82])) {
-                invopen = true;
-                //change bow
 
-                if (myGameArea.keys && myGameArea.keys[51]) {
-                    console.log("2")
-                    counts[2] += 1;
-                    if (counts[2] >= 20) {
-                        itemindex[2] += 1;
+                //update bow
+                myGameArea.context.fillStyle = "black"
+                myGameArea.context.fillRect(0, 0, 31 * myGamePiece.health + 31, 62);
+                for (var x = 0; x < myGamePiece.health; x++) {
+                    var img = new Image();
+                    img.src = "imgs/health/heart.png";
 
-                        counts[2] = 0;
-                        if (itemindex[2] >= bows.length) {
-                            itemindex[2] = 0;
-                        }
-                        equipped[2] = bows[itemindex[2]];
-                    }
+                    myGameArea.context.drawImage(img, 31 * x + 15, 15, 29, 29);
                 }
-                //change sword
-                if (myGameArea.keys && myGameArea.keys[50]) {
-                    console.log("2")
-                    counts[1] += 1;
-                    if (counts[1] >= 20) {
-                        itemindex[1] += 1;
-                        counts[1] = 0;
-                        if (itemindex[1] >= swords.length) {
-                            itemindex[1] = 0;
-                        }
-                        equipped[1] = swords[itemindex[1]];
-                    }
-                }
-                //background inventory
-                bg("inventory.png");
-                //set
-                var cx  = myGameArea.context;
+                //text
+                var cx = myGameArea.context;
                 cx.fillStyle = "white";
-                cx.font = "30px Arial"
-                //draw inventory, equipped items, arrows and coins.     
-                for (var c = 0; c < inv.length; c++) {
-                cx.fillText(inv[c], 20, (30 * c) + 40);
-                } 
-                cx.font = "100px Arial";
-                cx.fillText(coins, 562,80)
-                cx.font = "20px Arial"
-                cx.fillText(equipped[0],685,165)
-                cx.fillText(equipped[1],685,235)
-                cx.fillText(equipped[2],685,305)
-                cx.fillText(equipped[3],685,370)
-                cx.fillText(equipped[4],685,435)
-                cx.fillText(equipped[5],685,510)
-                cx.fillText(equipped[6],480,476)
-                cx.fillText(arrows,480,384)
+                cx.font = "30px Arial";
+                cx.fillText(text, 240, 30);
+                bow.x = myGamePiece.x;
+                bow.y = myGamePiece.y;
+                //point towards mouse
+                bow.angle = Math.atan2(-(myGamePiece.y - myGameArea.y), -(myGamePiece.x - myGameArea.x));
+                //if 3arrow not in flight, move  arrow to player and move with bow
+                if (!arrowinflight && arrows >= 1) {
+                    arrow.x = myGamePiece.x;
+                    arrow.y = myGamePiece.y;
+                    arrow.angle = bow.angle;
+                }
+                //if bow active weapon 
+                if (activeweapon == 1) {
 
-            } else {
-                // otherwise update player
-                     invopen = false;
-                  
-            
-                myGamePiece.newPos();
-            myGamePiece.update();
-                
+                    bow.update();
+                    //if you have arrows
+                    if (arrows >= 1 || (arrowinflight && arrows == 0)) {
+                        arrow.update();
+                    }
                 }
+
+                for (var q = 0; q < enemies.length; q++) {
+                    if (enemies[q].kb > 0) {
+                        enemies[q].x += (1.1 ** enemies[q].kb) * 25 / (1.1 ** 12) * enemies[q].kbd;
+                        enemies[q].kb -= 1;
+                        if (enemies[q].kb > 1) {
+                            enemies[q].image.src = "imgs/playerandenemy/enemydamaged.png";
+                        } else {
+                            enemies[q].image.src = "imgs/playerandenemy/enemy.png";
+                        }
+                    }
                 }
+
+
+                for (var t = 0; t < enemies.length; t++) {
+                    if (Math.abs(myGamePiece.x - enemies[t].x) <= 60 && Math.abs(myGamePiece.y - enemies[t].y) <= 60 && enemies[t].health > 0 && enemies[t].spawnroom == level && !invopen) {
+                        console.log("collision");
+                        if (myGamePiece.x >= enemies[t].x) {
+                            myGamePiece.kb = 12;
+                            myGamePiece.kbd = 1;
+
+
+                        } else {
+                            myGamePiece.kb = 12;
+                            myGamePiece.kbd = -1;
+                        }
+                        myGamePiece.health -= 1;
+                    }
+                }
+
+                for (var p = 0; p < enemies.length; p++) {
+                    if (enemies[p].x >= 900) {
+                        enemies[p].x = 90;
+                    } else if (enemies[p].x <= 60) {
+                        enemies[p].x = 870;
+                    }
+                }
+
+                //SPACE pressed, use weapon      
+                if ((myGameArea.click ||(myGameArea.keys && myGameArea.keys[32])) && !invopen) {
+                    //sword
+                    if (activeweapon == 0) {
+                        //set image, go to player  
+                        sword.image.src = swordpngs[itemindex[1]];
+                        sword.x = myGamePiece.x;
+                        sword.y = myGamePiece.y;
+                        //if right swing right    
+                        if (myGamePiece.dir == "r") {
+                            sword.angle += Math.PI / 36;
+                            if (sword.angle >= 0) {
+                                sword.angle = Math.PI / -2;
+                            }
+                            for (var x = 0; x < enemies.length; x++) {
+                                if (myGamePiece.x < enemies[x].x && myGamePiece.y >= enemies[x].y && Math.sqrt(((myGamePiece.x - enemies[x].x) ** 2) + ((myGamePiece.y - enemies[x].y) ** 2)) <= 150) {
+                                    if (enemies[x].kb == 0) {
+                                        enemies[x].health -= sworddmgs[itemindex[1]];
+                                    }
+                                    enemies[x].kb = 12;
+                                    enemies[x].kbd = 1;
+                                    level -= 1;
+                                    level += 1;
+                                    if (enemies[x].health == 0) {
+                                        textpuff("killed enemy, +" + enemies[x].dropgold + " coins");
+                                        setTimeout(textpuff, 10000, "");
+                                        coins += enemies[x].dropgold;
+                                        enemies[x].dropgold = 0;
+                                    }
+
+                                    console.log("WHACKY")
+                                }
+                            }
+                        }
+                        //if left swing left        
+                        if (myGamePiece.dir == "l") {
+                            sword.angle -= Math.PI / 36;
+                            if (sword.angle <= -1 * Math.PI) {
+                                sword.angle = Math.PI / -2;
+                            }
+                            for (var x = 0; x < enemies.length; x++) {
+                                if (myGamePiece.x > enemies[x].x && myGamePiece.y >= enemies[x].y && Math.sqrt(((myGamePiece.x - enemies[x].x) ** 2) + ((myGamePiece.y - enemies[x].y) ** 2)) <= 150) {
+                                    if (enemies[x].kb == 0) {
+                                        enemies[x].health -= sworddmgs[itemindex[1]];
+                                    }
+                                    level -= 1;
+                                    level += 1;
+                                    enemies[x].kb = 12;
+                                    enemies[x].kbd = -1;
+                                    console.log("WHACKY")
+                                    if (enemies[x].health == 0) {
+                                        textpuff("killed enemy, +" + enemies[x].dropgold + " coins");
+                                        setTimeout(textpuff, 10000, "");
+                                        coins += enemies[x].dropgold;
+                                        enemies[x].dropgold = 0;
+                                    }
+                                }
+                            }
+                        }
+                        sword.update();
+                    }
+                    //bow  
+                    if (activeweapon == 1 && !arrowinflight && arrows >= 1) {
+                        //set original angle, show in flight, reset time, -1 arrows. 
+                        arrowangle = arrow.angle;
+                        arrowinflight = true;
+                        arrowcounter = 0;
+                        arrows -= 1;
+                        arrowlaunchroom = level;
+                    }
+
+                }
+
+                if (arrowinflight && !invopen) {
+                    //count time, used for quadratic flight path  
+                    arrowcounter += 0.02;
+                    //move along horizontally
+                    arrow.x += (Math.sin(arrowangle + Math.PI / 2)) * 10;
+                    //move vertically, then subtract time in air 
+                    arrow.y += -10 * (Math.cos(arrowangle + Math.PI / 2)) + 10 * (arrowcounter ** 2);
+                    //aim  
+                    arrow.angle = Math.atan2(-10 * (Math.cos(arrowangle + Math.PI / 2)) + 10 * (arrowcounter ** 2), (Math.sin(arrowangle + Math.PI / 2)) * 10)
+                    //when hits ground, stop flying
+                    arrowhits[0] = arrow.x;
+                    arrowhits[1] = arrow.y;
+                    arrowhits[2] = arrow.x - 75 * Math.sin(arrow.angle - Math.PI / 2);
+                    arrowhits[3] = arrow.y + 75 * Math.cos(arrow.angle - Math.PI / 2);
+                    for (var z = 0; z < enemies.length; z++) {
+                        if (arrowhits[3] >= enemies[z].y - 30 && arrowhits[2] <= enemies[z].x + 30 && arrowhits[2] >= enemies[z].x - 30 && enemies[z].x > 0) {
+                            enemies[z].health -= 3;
+                            enemies[z].kb = 12;
+                            if (arrow.x > enemies[z].x) {
+                                enemies[z].kbd = -1;
+                            } else {
+                                enemies[z].kbd = 1;
+                            }
+                            if (enemies[z].health <= 0) {
+                                textpuff("killed enemy, +" + enemies[z].dropgold + " coins");
+                                setTimeout(textpuff, 10000, "");
+                                coins += enemies[z].dropgold;
+                                enemies[z].dropgold = 0;
+                            }
+                            arrowinflight = false;
+
+                        }
+                        console.log(arrowhits[2], arrowhits[3], enemies[z].x, enemies[z].y)
+                    }
+                    console.log(arrowlaunchroom, level)
+                    if (arrowhits[2] >= 898 || arrowhits[3] <= 62 || arrowhits[2] <= 62 || arrowhits[3] >= 478 || arrowlaunchroom != level) {
+                        arrowinflight = false;
+                    }
+
+                }
+
+
+                //inventory open
+                if (myGameArea.keys && (myGameArea.keys[114] || myGameArea.keys[82])) {
+                    invopen = true;
+                    //change bow
+
+                    if (myGameArea.keys && myGameArea.keys[51]) {
+                        console.log("2")
+                        counts[2] += 1;
+                        if (counts[2] >= 20) {
+                            itemindex[2] += 1;
+
+                            counts[2] = 0;
+                            if (itemindex[2] >= bows.length) {
+                                itemindex[2] = 0;
+                            }
+                            equipped[2] = bows[itemindex[2]];
+                        }
+                    }
+                    //change sword
+                    if (myGameArea.keys && myGameArea.keys[50]) {
+                        console.log("2")
+                        counts[1] += 1;
+                        if (counts[1] >= 20) {
+                            itemindex[1] += 1;
+                            counts[1] = 0;
+                            if (itemindex[1] >= swords.length) {
+                                itemindex[1] = 0;
+                            }
+                            equipped[1] = swords[itemindex[1]];
+                        }
+                    }
+                    //background inventory
+                    bg("backgrounds/inventory.png");
+                    //set
+                    var cx = myGameArea.context;
+                    cx.fillStyle = "white";
+                    cx.font = "30px Arial"
+                    //draw inventory, equipped items, arrows and coins.     
+                    for (var c = 0; c < inv.length; c++) {
+                        cx.fillText(inv[c], 20, (30 * c) + 40);
+                    }
+                    cx.font = "100px Arial";
+                    cx.fillText(coins, 562, 80)
+                    cx.fillText(myGamePiece.health, 850, 80)
+                    cx.font = "20px Arial"
+                    cx.fillText(equipped[0], 685, 165)
+                    cx.fillText(equipped[1], 685, 235)
+                    cx.fillText(equipped[2], 685, 305)
+                    cx.fillText(equipped[3], 685, 370)
+                    cx.fillText(equipped[4], 685, 435)
+                    cx.fillText(equipped[5], 685, 510)
+                    cx.fillText(equipped[6], 480, 476)
+                    cx.fillText(arrows, 480, 384)
+
+                } else {
+                    // otherwise update player
+                    invopen = false;
+
+
+                    myGamePiece.newPos();
+                    myGamePiece.update();
+
+                }
+            }
         }
-     
-     
-       //accelerate function 
+
+
+        //accelerate function 
         function accelerate(n) {
             myGamePiece.gravity = n;
         }
         //background function 
         function bg(x) {
-             var cx = myGameArea.context;
-                var xpolink = new Image();
-                xpolink.src = x;
-                cx.drawImage(xpolink,0,0,960,540);
+            var cx = myGameArea.context;
+            var xpolink = new Image();
+            xpolink.src = x;
+            cx.drawImage(xpolink, 0, 0, 960, 540);
         }
         //necessary for setTimeout() so textpuffs disappear.   
         function textpuff(x) {
-           text = x;
+            text = x;
         }
         
     </script>
