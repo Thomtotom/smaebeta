@@ -1,0 +1,584 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <style>
+        .other, .common, .uncommon, .rare, .limited, .scarce, .extreme, .isolated, .godly, .invisible, .impossible, .theone, .q {
+            font-family: 'Quicksand';
+            font-weight: bold;
+        }
+    
+        .active::after {
+            content: "<"
+        }
+
+        .common {
+            font-style: italic;
+            color: #e89998;
+            background-color: black;
+        }
+
+            .common:before {      
+                content: "Common";
+            }
+
+        .uncommon {
+            font-style: italic;
+            color: #fff2ca;
+            background-color: black;
+        }
+
+            .uncommon:before {
+                content: "Uncommon";
+            }
+
+        .rare {
+            font-style: italic;
+            color: #a0c5ea;
+            background-color: black;
+        }
+
+            .rare:before {
+                content: "Rare";
+            }
+
+        .limited {
+            font-style: italic;
+            color: #0800ff;
+            background-color: black;
+        }
+
+            .limited:before {
+                content: "Limited";
+            }
+
+        .scarce {
+            font-style: italic;
+            color: #2bff00;
+            background-color: black;
+        }
+
+            .scarce:before {
+                content: "Scarce";
+            }
+
+        .extreme {
+            font-style: italic;
+            color: #ffff00;
+            background-color: black;
+        }
+
+            .extreme:before {
+                content: "Extreme";
+            }
+
+        .isolated {
+            font-style: italic;
+            color: #fd9900;
+            background-color: black;
+        }
+
+            .isolated:before {
+                content: "Isolated";
+            }
+
+        .godly {
+            font-style: italic;
+            color: #fc0000;
+            background-color: black;
+        }
+
+            .godly:before {
+                content: "Godly";
+            }
+
+        .invisible {
+            font-style: italic;
+            color: #b7b7b7;
+            background-color: black;
+        }
+
+            .invisible:before {
+                content: "Invisible";
+            }
+
+        .impossible {
+            font-style: italic;
+            color: #ffffff;
+            background-color: black;
+        }
+
+            .impossible:before {
+                content: "Impossible";
+            }
+
+        .theone {
+            font-style: italic;
+            color: #000000;
+            background-color: white;
+        }
+
+            .theone:before {
+                content: "The One";
+            }
+
+        .q {
+            font-style: italic;
+            color: #fc00ff;
+            background-color: black;
+        }
+
+            .q:before {
+                content: "Q";
+            }
+        #inv {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: white;
+            width: 432px;
+            height: 152px;
+            border:1px solid black;
+        }
+        #inv div{
+            border:1px solid black;
+            box-sizing: border-box;
+            width: 50px;
+            height:34px;
+            margin:2px;
+        }
+        #inv p{
+            width: 16px;
+            margin: 0px;
+        }
+            #inv img {
+                
+                min-width: 32px;
+                height: 32px;
+                margin: 0px;
+                text-align: center;
+                line-height: 75px;
+                font-size: 30px;
+                box-sizing: border-box;
+            }
+            #inv img:active{
+                cursor:grab;
+                cursor:-webkit-grab;
+                cursor:-moz-grab;
+                /*I HATE browser incompatibility! Why can't everyone just get along???*/
+            }
+            #fullgame{
+                background-color: white;
+            }
+            #actitem{
+                border:1px solid black;
+            }
+    </style>
+</head>
+<body onload="startGame()">
+    <div id="fullgame">
+        <div id="dialog"></div>
+        <table><tr><td>
+        <div id="inv">
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+            <div><img /><span></span></div>
+        </div></td><td>
+        <div id="actitem"></div>
+        </td></tr></table>
+    </div>
+    <button onclick="openFullscreen()">Fullscreen</button>
+    <script>
+        var elem = document.getElementById("fullgame");
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+        }
+        /*Again, WHY do different browsers use different systems???*/
+        var invrow = 0;
+        var invraritys = [];
+        var inventory = document.getElementById("inv").getElementsByTagName("DIV");
+        var invnums = document.getElementById("inv").getElementsByTagName("P");
+        var ai = document.getElementById("actitem");
+        var gi = [
+            new item("Apple", "", "rare", "Food", "Heal:10"), // 0
+            new item("Cookie", "", "limited", "Food", "Heal:15"),
+            new item("Stew", "", "limited", "Food", "Heal:30<br>Cooldown: 2min"),
+            new item("Carrot", "", "rare", "Food", "Heal:10"),
+            new item("Banana", "", "scarce", "Food", "Heal:30"),
+            new item("Cheese", "", "scarce", "Food", "Heal:30"), //5  
+            new item("Fish", "imgs/fish.png", "common", "Food", "Heal:5"),
+            new item("Bread", "imgs/bread.png", "uncommon", "Food", "Heal:5"),
+            new item("Bore slice", "imgs/boreslice.png", "uncommon", "Food", "Heal:20<br>Effect:Sickness 15 sec"),
+            new item("Chimer Berry", "imgs/chimer.png", "common", "Food", "Heal:3"),
+            new item("Fengoku Berry", "imgs/fengoku.png", "rare", "Food", "Heal:15"), //10
+            new item("Gafill Fruit", "imgs/gafill.png", "uncommon", "Food", "Heal:10"),
+            new item("Hanarian Gafill Fruit", "imgs/hanarian-gafill.png", "rare", "Food", "Heal:15"),
+            new item("Polo Fruit", "imgs/polofruit.png", "scarce", "Food", "Heal:50<br>Effect:Jump boost 15 sec"),
+            new item("Chumbawumba Fruit slice", "imgs/chumbawumba.png", "extreme", "Food", "Heal:25"),
+            new item("Italy Fruit", "imgs/italyfruit.png", "rare", "Food", "Effect:Speed boost 30 sec"),//15
+            new item("Balar Fruit slice", "imgs/balar.png", "rainbow", "Food", "Heal:30<br>Effect:Invisibility 10 sec"),
+
+            new item("Pickaxe", "imgs/pickaxe.png", "limited", "Mine stone and iron", "Speed:3"),
+            new item("Chainsaw", "imgs/chainsaw.png", "isolated", "Cut down trees super fast", "Speed:15"),
+            new item("Shovel", "", "scarce", "Mine dirt, sand and gravel", "Speed:8"),
+            new item("Fishing Rod", "imgs/fishingrod.png", "limited", "Catch fish", "Speed:5"), //20
+            new item("Axe", "imgs/axe.png", "limited", "Cut down trees", "Speed:5"),
+
+            new item("Bow", "", "limited", "Weapon", "Damage:5<br>Knockback:3<br>Type:Ranged,Launcher"),
+            new item("Dagger", "", "limited", "Weapon", "Damage:6<br>Knockback:1<br>Type:Melee"),
+            new item("Golden Shuriken", "", "extreme", "Weapon", "Damage:21<br>Knockback:5<br>Type:Ranged,expendable"),
+            new item("Diamond Sword", "", "rainbow", "Weapon", "Damage:15<br>Knockback:7<br>Type:Melee"),//25
+            new item("Bomb", "", "scarce", "Weapon", "Area Damage:30<br>Type:Explosive,Expendable<br>Radius:2<br>Delay:3"),
+            new item("Arrow", "", "uncommon", "Weapon", "Damage:5<br>Knockback:3<br>Type:Ammo,expendable"),
+            new item("Poison Arrow", "", "limited", "Weapon", "Damage:4<br>Knockback:2<br>Type:Ammo,expendable<br>Effect:Poison 15sec"),
+            new item("Staff of Power", "", "godly", "Weapon", "Area Damage:5<br>Radius:1<br>Type:Ranged,Magic"),
+
+            new item("Nature boots", "imgs/natureboots.png", "rainbow", "Armor", "Ability:When wearing full set, summon up to 5 trees, 10 minute cooldown<br>Protection:5"), //30
+            new item("Nature leggings", "imgs/naturelegs.png", "rainbow", "Armor", "Ability:When wearing full set, summon up to 5 trees, 10 minute cooldown<br>Protection:10"),
+            new item("Nature chestplate", "imgs/naturechest.png", "rainbow", "Armor", "Ability:When wearing full set, summon up to 5 trees, 10 minute cooldown<br>Protection:15"),
+            new item("Nature helmet", "imgs/naturehelmet.png", "rainbow", "Armor", "Ability:When wearing full set, summon up to 5 trees, 10 minute cooldown<br>Protection:5"),
+            new item("Magician's cloak", "", "godly", "Accessory", "Ability:Invisibility 2 min, 1min cooldown<br>Protection:2"),
+            new item("Beanie", "", "rare", "Accessory", "Protection:3"),//35
+            new item("Seven-League Boots", "", "invisible", "Armor", "Ability:Teleport up to 1000km, 1min cooldown<br>Protection:2"),
+            new item("Helmet of fire", "", "godly", "Armor", "Ability:Set enemies within 3 blocks on fire, constant<br>Protection:5"),
+
+            new item("Lantern", "imgs/lantern.png", "rare", "Light", "Light:14"),
+            new item("Candle", "", "uncommon", "Light", "Light:10"),
+            new item("Torch", "", "common", "Light", "Light:8"), //40
+
+            new item("Portal", "imgs/portal.png", "godly", "Creates a link through time and space to the other portal of its kind", ""),
+            new item("Clock", "imgs/clock.png", "rare", "Tells the time", ""),
+            new item("Paper", "imgs/paper.png", "common", "Something to write on", ""),
+            new item("Pen", "", "uncommon", "Write on paper", ""),
+            new item("Book", "imgs/book.png", "rare", "Something to read", ""),//45
+            new item("Card", "imgs/card.png", "uncommon", "Play various games", ""),
+            new item("Fork", "imgs/fork.png", "uncommon", "Eat food without touching it with your hands", ""),
+            new item("Gem", "", "limited", "Currency ", "Value: 50"),
+            new item("Scroll", "", "scarce", "Something to read, generally ancient and valuable", ""),
+            new item("Wheel", "", "scarce", "Attach to something and it can roll!", ""),//50
+            new item("Globe", "", "godly", "Map of world, will expand to include surrounding terrain ", "Generation Radius: 10km"),
+            new item("Chest", "", "limited", "store items", "Capacity: 20 items <br>Pickup: False"),
+            new item("Key", "", "isolated", "Unlocks a specific lock", ""),
+            new item("Paintbrush", "", "scarce", "Paint stuff", ""),
+            new item("Birthday Cake ", "", "q", "Feed to kids! ", ""),//55
+            new item("Sunflower ", "", "q", "Brew various ancient potions", ""),
+            new item("Rainbow", "", "q", "Craft an eternal light", ""),
+            new item("Coin", "", "common", "Currency", "Value: 1"),
+            new item("Diamond", "", "isolated", "Craft diamond tools and weapons", ""),
+            new item("Healing Potion", "", "isolated", "Heal damage", "Heal: 100"),//60
+            new item("Strength Potion", "", "godly", "Increase damage to enemies", "Damage boost: 100%"),
+            new item("Brick", "imgs/brick.png", "common", "Build houses", ""),
+            new item("Blanket", "imgs/blanket.png", "limited", "Keep you warm", ""),
+            new item("Bed", "imgs/bed.png", "scarce", "Sleep on", "Heal: 5/h"),
+            new item("Bucket", "imgs/bucket.png", "rare", "Hold water", ""),//65
+            new item("Canoe Paddle", "imgs/paddle.png", "scarce", "Move a canoe", "Speed: 10kph"),
+            new item("Canoe", "imgs/canoe.png", "scarce", "Move across water easily", "Max weight: 150kg"),
+            new item("Paint", "imgs/paint.png", "uncommon", "Paint stuff", ""),
+            new item("Bag", "imgs/bag.png", "scarce", "Portable Storage", "Capacity: 5<br>Pickup: True"),
+        ];
+        var itemlist = [];
+        var itemimgs = [];
+        var scene = 1;
+        var invdesc = [];
+        var invstat = [];
+        var dialog = document.getElementById("dialog");
+        var int = setInterval(updateGameArea, 10);
+        var keys;
+        function item(name, src, rarity, desc, stat) {
+            this.name = name;
+            this.src = src;
+            this.rarity = rarity;
+            this.desc = desc;
+            this.stat = stat;
+            this.inv = 0;
+        }
+
+        window.addEventListener('keydown', function (e) {
+            keys = (keys || []);
+            keys[e.keyCode] += 1;
+        })
+        window.addEventListener('keyup', function (e) {
+            keys[e.keyCode] = 0;
+        })
+
+        var dialogrow = 0;
+        function updateGameArea() {
+            if (scene == 1) {
+
+                dialogue("Awaken my child");
+                setTimeout(dialogue, 3000, "Hurry up, please wake up!");
+                setTimeout(dialogue, 6000, "WAKE UP NOW, PLEASE!");
+                setTimeout(dialogue, 9000, "PLEASE! DON'T GO NOW!");
+                setTimeout(dialogue, 12000, "<i>How did you get this message?</i>")
+                scene = 1.1;
+            }
+            if (scene == 1.1) {
+
+
+                setTimeout(sceneset, 15000, 2);
+            }
+            if (scene == 2) {
+
+                dialogue("Guard: Hello?");
+                dialogue("Guard: Hello?<br><br><span class='option' id='2.1' >Where am I?</span><br><span class='option' id='2.2'>Who are you?</span>")
+
+            }
+            if (scene == 2.1) {
+                setTimeout(dialogue, 0000, "You: Where am I?");
+
+                setTimeout(dialogue, 1000, "Guard:You are in the castle of Smae of course");
+                setTimeout(dialogue, 2000, "You:Ok");
+                setTimeout(dialogue, 4000, "You: Who are you?");
+                setTimeout(dialogue, 6000, "Guard: I am an honorary guard of the second britalion ");
+                setTimeout(dialogue, 8000, "You: How did I get here?");
+                setTimeout(dialogue, 10000, "Guard: We just saw you sleeping on the ground.");
+                setTimeout(dialogue, 12000, "You: Wait wait… where am I again??");
+                setTimeout(dialogue, 14000, "Guard: The Castle Of Smae.");
+                setTimeout(dialogue, 16000, "You: What happens in this place?");
+                setTimeout(dialogue, 18000, "Guard: Well it's mostly just people in a castle living their lives.");
+                setTimeout(dialogue, 20000, "You: Do you know who rules this place?");
+                setTimeout(dialogue, 22000, "Guard: Its King Smae I. He is the ruler of this place");
+                setTimeout(dialogue, 24000, "You: Ok.");
+                setTimeout(dialogue, 26000, "Guard: Your welcome");
+                setTimeout(dialogue, 28000, "You: Also where is the nearest market, I'm STARVING!!!!");
+                setTimeout(dialogue, 30000, "Guard: Oh it's just down the road. But here's my leftover lunch.");
+                setTimeout(dialogue, 32000, "<i>Bread added to inventory</i>");
+                setTimeout(invpush, 32000, 7,1)
+                setTimeout(dialogue, 34000, "You: Thanks and bye!");
+                setTimeout(dialogue, 36000, "Guard: Bye!");
+                setTimeout(dialogue, 38000, "<i>You walk to the market</i>");
+
+                scene = 2.11;
+
+            }
+            if (scene == 2.2) {
+                setTimeout(dialogue, 0000, "You: Who are you?");
+                setTimeout(dialogue, 3000, "Guard: I am an honorary guard of the second britalion ");
+                setTimeout(dialogue, 6000, "You: How did I get here?");
+                setTimeout(dialogue, 90000, "Guard: We just saw you sleeping on the ground.");
+                setTimeout(dialogue, 12000, "You: Wait wait… where am I again??");
+                setTimeout(dialogue, 14000, "Guard: The Castle Of Smae.");
+                setTimeout(dialogue, 16000, "You: What happens in this place?");
+                setTimeout(dialogue, 18000, "Guard: Well it's mostly just people in a castle living their lives.");
+                setTimeout(dialogue, 20000, "You: Do you know who rules this place?");
+                setTimeout(dialogue, 22000, "Guard: Its King Smae I. He is the ruler of this place");
+                setTimeout(dialogue, 24000, "You: Ok.");
+                setTimeout(dialogue, 26000, "Guard: Your welcome");
+                setTimeout(dialogue, 28000, "You: Also where is the nearest market, I'm STARVING!!!!");
+                setTimeout(dialogue, 30000, "Guard: Oh it's just down the road. But here's my leftover lunch.");
+                setTimeout(dialogue, 32000, "<i>Bread added to inventory</i>");
+                setTimeout(invpush, 32000, 7,1)
+
+                setTimeout(dialogue, 34000, "You: Thanks and bye!");
+                setTimeout(dialogue, 36000, "Guard: Bye!");
+                setTimeout(dialogue, 38000, "<i>You walk to the market</i>");
+
+                scene = 2.11;
+
+            }
+
+            if (scene == 2.11) {
+                setTimeout(sceneset, 40000, 2.3);
+            }
+            if (scene == 2.3) {
+
+                setTimeout(sceneset, 4000, 3)
+            }
+            if (scene == 3) {
+                dialogue("<i>You enter the market. There is a store, and an old lady.</i><br><br><span class='option' id='3.1' ><i>Look at the shop</i></span><br><span class='option' id='3.2'><i>Talk to the old lady</i></span>")
+            }
+            if (scene == 3.1) {
+                dialogue("<i>You walk up to the map store.</i><br><br>Shopkeeper One: hello youngling what are you doing in my humble map making shop.<br><br><span class='option' id='3.11' >Map making shop?</span><br><span class='option' id='3.12'>What's your name?</span>")
+            }
+            if (scene == 3.11) {
+                setTimeout(dialogue, 0000, "You: Map making shop?");
+                setTimeout(dialogue, 3000, "Shopkeeper One: ye this tis me lil shop do you want to have one I think I might have a spere map of smae castle but if you want more you’ll Have ta give me ten gems. Well do ya wan it?<br><br><span class='option' id='3.111'>Yes please</span><br><span class='option' id='3.112'>No thanks</span>");
+
+                scene = 3.011;
+            }
+            if (scene == 3.111) {
+                dialogue("Shopkeeper: Tat’ would be 10 gems please!")
+                setTimeout(dialogue, 3000, "You: … Oh right I don't have any gems, I'm sorry")
+                setTimeout(dialogue, 6000, "Shopkeeper: Oh, It’s ok I don’t need this crusty lil map anyways! Here, have it for free!")
+                setTimeout(dialogue, 8000, "<i>The Smae Kingdom Map added to your inventory</i>")
+                setTimeout(dialogue, 10000, "<i>Press E to use</i>")
+                setTimeout(dialogue, 12000, "You: Thanks! ")
+                setTimeout(dialogue, 18000, "Shopkeeper: Here's a bunch of random useless stuff! ")
+
+                setTimeout(invpush, 18000, 6,1);
+                setTimeout(invpush, 18000, 43,1);
+                setTimeout(invpush, 18000, 41,17);
+                setTimeout(invpush, 18000, 65,1);
+                setTimeout(invpush, 18000, 62,1);
+                setTimeout(invpush, 18000, 63,2);
+                setTimeout(invpush, 18000, 9,5);
+                setTimeout(invpush, 18000, 19,6);
+                setTimeout(invpush, 18000, 13,5);
+                setTimeout(invpush, 18000, 64,12);
+                setTimeout(invpush, 18000, 69,4);
+                setTimeout(invpush, 18000, 41,2);
+                setTimeout(invpush, 18000, 52,6);
+                setTimeout(invpush, 18000, 45,5);
+                scene = 3.1111;
+                
+            }
+            if (scene == 3.1111) {
+                setTimeout(sceneset, 21000, 4)
+            }
+            if (scene == 3.112) {
+                dialogue("Shopkeeper: Why not sonny?")
+                setTimeout(dialogue, 3000, "You: I don't have any gems!")
+                setTimeout(dialogue, 6000, "Shopkeeper: That's no problem boy! I didn't need this crusty map anyways! Here you go!")
+                setTimeout(dialogue, 8000, "<i>The Smae Kingdom Map added to your inventory</i>")
+                setTimeout(dialogue, 10000, "<i>Press E to use</i>")
+                setTimeout(dialogue, 12000, "You: Thanks! ")
+                scene = 3.1111;
+            }
+            if (scene == 3.12) {
+                dialogue("Shopkeeper: Yes! A map making shop! We make maps for near and far! Now sonny boy, do ya want anything ?<br><br><span class='option' id='3.11'>Could I have a map of Smae Kingdom?</span><br><span class='option' id='3.3' >No thanks</span>")
+            }
+            if (scene == 3.3) {
+                dialogue("Shopkeeper: Okay! See you round! ");
+                setTimeout(sceneset, 3000, 4);
+            }
+            if (scene == 3.2) {
+                setTimeout(dialogue, 0000, "Old Lady: Hello? What are you doing here young one?<br><br><span class='option' id='3.21'>What is this place?</span><br><span class='option' id='3.22'>Who are you?</span>")
+            }
+            if (scene == 3.21) {
+                setTimeout(dialogue, 0000, "You: What is this place?")
+                setTimeout(dialogue, 3000, "Old Lady: You’re in Market Market obviously!")
+                setTimeout(dialogue, 6000, "You: Do you know where to buy food?")
+                setTimeout(dialogue, 9000, "Old Lady: Look around you!")
+                setTimeout(dialogue, 12000, "You: Ok thanks.")
+                scene = 3.211;
+            }
+            if (scene == 3.211) {
+                setTimeout(sceneset, 15000, 4);
+            }
+            if (scene == 3.22) {
+                setTimeout(dialogue, 0000, "You: Who are you?")
+                setTimeout(dialogue, 3000, "Old Lady: I'm just an old lady buying food for dinner.")
+                setTimeout(dialogue, 6000, "You: What do you think the best food here is?")
+                setTimeout(dialogue, 9000, "Old Lady: Definity the Boar Slice! It's a slice of cake with some secret ingredient that we the people can't know.")
+                setTimeout(dialogue, 12000, "Old Lady: I have one in my bag you can have it.")
+                setTimeout(dialogue, 15000, "<i>The Bore Slice added to your inventory</i>")
+                setTimeout(invpush, 15000, 8,1)
+
+                setTimeout(dialogue, 18000, "<i> Press E to eat </i>")
+                scene = 3.212;
+            }
+            if (scene == 3.212) {
+                setTimeout(sceneset, 21000, 4)
+            }
+            if (scene == 4) {
+                dialogue("The end for now! You have reached a part of the game which is still under development.")
+
+            }
+            var ops = document.getElementsByClassName("option");
+            if (keys && keys[38] >= 1) {
+                keys[38] = 0;
+                dialogrow -= 1;
+                if (dialogrow == -1) {
+                    dialogrow = ops.length - 1;
+                }
+            }
+            if (keys && keys[40] >= 1) {
+                keys[40] = 0;
+
+                dialogrow += 1;
+                if (dialogrow == ops.length) {
+                    dialogrow = 0;
+                }
+            }
+            if (keys && keys[39] >= 1) {
+                keys[39] = 0;
+                sceneset(ops[dialogrow].id);
+            }
+            for (var x = 0; x < ops.length; x++) {
+                if (x == dialogrow) {
+                    ops[x].classList.add("active");
+                } else {
+                    ops[x].classList.remove("active");
+                }
+            }
+            for (var x = 0; x < itemlist.length; x++) {
+                inventory[x].firstChild.src = gi[itemlist[x]].src;
+                inventory[x].firstChild.style.cursor = "pointer";
+                inventory[x].firstChild.onclick = function (number) { 
+                    return function () {
+                        activeitem(number);                        
+                    };
+                }(x);
+                inventory[x].lastChild.innerHTML = gi[itemlist[x]].inv;
+            }
+            if (itemlist[0]) {
+                ai.innerHTML = "";
+                ai.innerHTML += "<img src='" + gi[itemlist[invrow]].src + "'style='width: 64px; height: 64px;'><br><span>" + gi[itemlist[invrow]].name + "</span><br>";
+                if (gi[itemlist[invrow]].rarity == "rainbow") {
+                    ai.innerHTML += "<span class='other'><span style='color: red; font-style: italic; background-color: black'>R</span><span style='color: orange; font-style: italic; background-color: black'>A</span><span style='color: yellow; font-style: italic; background-color: black'>I</span><span style='color: green; font-style: italic; background-color: black'>N</span><span style='color: blue; font-style: italic; background-color: black'>B</span><span style='color: indigo; font-style: italic; background-color: black'>O</span><span style='color: violet; font-style: italic; background-color: black'>W</span></span><br>"
+                } else if (gi[itemlist[invrow]].rarity == "???") {
+                    ai.innerHTML += "<span class='other'><span style='color: red; font-style: italic; background-color: black'>? </span><span style='color: blue; font-style: italic; background-color: black'>? </span><span style='color: green; font-style: italic; background-color: black'>?</span></span><br>"
+                } else {
+                    ai.innerHTML += "<span class='" + gi[itemlist[invrow]].rarity + "'></span><br>"
+                    console.log(ai.innerHTML);
+                }
+                ai.innerHTML += gi[itemlist[invrow]].desc + "<br>" + gi[itemlist[invrow]].stat;
+            }
+        }
+        function invpush(itemsrc, num) {
+            if (gi[itemsrc].inv == 0) {
+
+
+                itemlist.push(itemsrc);
+            }
+            gi[itemsrc].inv += num;
+        }
+        function sceneset(x) {
+            scene = x;
+        }
+        function activeitem(f) {
+            invrow = f;
+        }
+        function dialogue(x) {
+            dialog.innerHTML = x;
+        }</script>
+</body>
+</html>
