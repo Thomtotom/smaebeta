@@ -1,0 +1,16 @@
+body{
+    background-image: url('index.png');
+    background-size: 100%;
+}
+
+
+.button {
+    background-color: teal; 
+    object-position: center;
+    size: 50px,50px;
+
+  }
+
+  .blankspace{
+      padding: 50px,100%;
+  }
