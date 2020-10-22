@@ -330,7 +330,7 @@
         ];
         var itemlist = [];
         var itemimgs = [];
-        var scene = 3.111;
+        var scene = 1;
         var invdesc = [];
         var invstat = [];
         var alerts = document.getElementById("alerts");
@@ -386,7 +386,7 @@
             if (scene == 2) {
 
                 dialogue("Guard: Hello?");
-                dialogue("Guard: Hello?<br><br><span class='option' id='2.1' >Where am I?</span><br><span class='option' id='2.2'>Who are you?</span>")
+                dialogue("Guard: Hello?<br><br><a onmousedown='sceneset(2.1)'>Where am I?</a><br><a onmousedown='sceneset(2.2)'>Who are you?</a>")
 
             }
             if (scene == 2.1) {
@@ -451,14 +451,14 @@
                 setTimeout(sceneset, 4000, 3)
             }
             if (scene == 3) {
-                dialogue("<i>You enter the market. There is a store, and an old lady.</i><br><br><span class='option' id='3.1' ><i>Look at the shop</i></span><br><span class='option' id='3.2'><i>Talk to the old lady</i></span>")
+                dialogue("<i>You enter the market. There is a store, and an old lady.</i><br><br><a onmousedown='sceneset(3.1)'><i>Look at the shop</i></a><br><a onmousedown='sceneset(3.2)'><i>Talk to the old lady</i></a>")
             }
             if (scene == 3.1) {
-                dialogue("<i>You walk up to the map store.</i><br><br>Shopkeeper One: hello youngling what are you doing in my humble map making shop.<br><br><span class='option' id='3.11' >Map making shop?</span><br><span class='option' id='3.12'>What's your name?</span>")
+                dialogue("<i>You walk up to the map store.</i><br><br>Shopkeeper One: hello youngling what are you doing in my humble map making shop.<br><br><a onmousedown='sceneset(3.11)' >Map making shop?</a><br><span onclick='sceneset(3.12)'>What's your name?</span>")
             }
             if (scene == 3.11) {
                 setTimeout(dialogue, 0000, "You: Map making shop?");
-                setTimeout(dialogue, 3000, "Shopkeeper One: ye this tis me lil shop do you want to have one I think I might have a spere map of smae castle but if you want more you’ll Have ta give me ten gems. Well do ya wan it?<br><br><span class='option' id='3.111'>Yes please</span><br><span class='option' id='3.112'>No thanks</span>");
+                setTimeout(dialogue, 3000, "Shopkeeper One: ye this tis me lil shop do you want to have one I think I might have a spere map of smae castle but if you want more you’ll Have ta give me ten gems. Well do ya wan it?<br><br><a onmousedown='sceneset(3.111)'>Yes please</a><br><a onmousedown='sceneset(3.112)'>No thanks</a>");
 
                 scene = 3.011;
             }
@@ -515,14 +515,14 @@
                 scene = 3.1111;
             }
             if (scene == 3.12) {
-                dialogue("Shopkeeper: Yes! A map making shop! We make maps for near and far! Now sonny boy, do ya want anything ?<br><br><span class='option' id='3.11'>Could I have a map of Smae Kingdom?</span><br><span class='option' id='3.3' >No thanks</span>")
+                dialogue("Shopkeeper: Yes! A map making shop! We make maps for near and far! Now sonny boy, do ya want anything ?<br><br><a onmousedown='sceneset(3.11)'>Could I have a map of Smae Kingdom?</a><br><a onmousedown='sceneset(3.3)' >No thanks</a>")
             }
             if (scene == 3.3) {
                 dialogue("Shopkeeper: Okay! See you round! ");
                 setTimeout(sceneset, 3000, 4);
             }
             if (scene == 3.2) {
-                setTimeout(dialogue, 0000, "Old Lady: Hello? What are you doing here young one?<br><br><span class='option' id='3.21'>What is this place?</span><br><span class='option' id='3.22'>Who are you?</span>")
+                setTimeout(dialogue, 0000, "Old Lady: Hello? What are you doing here young one?<br><br><a onmousedown='sceneset(3.21)'>What is this place?</a><br><a onmousedown='sceneset(3.22)'>Who are you?</a>")
             }
             if (scene == 3.21) {
                 setTimeout(dialogue, 0000, "You: What is this place?")
@@ -554,7 +554,7 @@
                 dialogue("The end for now! You have reached a part of the game which is still under development.")
 
             }
-            var ops = document.getElementsByClassName("option");
+            /*var ops = document.getElementsByClassName("option");
             if (keys && keys[38] >= 1) {
                 keys[38] = 0;
                 dialogrow -= 1;
@@ -580,7 +580,7 @@
                 } else {
                     ops[x].classList.remove("active");
                 }
-            }
+            }*/
             for (var x = 0; x < itemlist.length; x++) {
                 inventory[x].firstChild.src = gi[itemlist[x]].src;
                 inventory[x].firstChild.style.cursor = "pointer";
@@ -621,6 +621,7 @@
         }
         function dialogue(x) {
             dialog.innerHTML = x;
-        }</script>
+        }
+    </script>
 </body>
 </html>
