@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        img {
+            transform: translate(-482px,-226px);
+            width: 260px;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body onload="startGame()">
+    <script>
+        var walkable = ['floor', 'tb', 'ep', 'com', 'mbt', 'epf', 'comf', 'mbtf', 'gh', 'ghf', 'sto', 'stof', 'tsh', 'tshf', 'gw', 'rw', 'yw', 'ls', 'lsf', 'w', 'wf'];
+        var blocks = [];
+        var screenNum = 0;
+//spawn, map size
+        var xpos = 17, ypos = 3, height = 32, width = 32;
+
+        function loadTiles() {
+            for (var row = 0; row < height; row++) {
+                for (var tile = 0; tile < width; tile++) {
+                    blocks[(width * row) + tile] = 'out';
+                }
+            }
+            //config map - use addDetail or extras
+        }
+
+        function addDetail(xx, yy, src) {
+            blocks[(yy * width) + xx] = src;
+        }
+        function startGame() {
+            myGameArea.start();
+        }
+        var myGameArea = {
+            start: function () {
+                document.getElementById("canvas").width = 700;
+                document.getElementById("canvas").height = 700;
+                this.context = document.getElementById("canvas").getContext("2d");
+                this.interval = setInterval(updateGameArea, 50);
+                window.addEventListener('keydown', function (e) {
+                    myGameArea.keys = (myGameArea.keys || []);
+                    myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                })
+                window.addEventListener('keyup', function (e) {
+                    myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                })
+                window.addEventListener('mousedown', function (e) {
+                    myGameArea.x = e.pageX;
+                    myGameArea.y = e.pageY;
+                    myGameArea.click = true;
+                })
+                window.addEventListener('mousemove', function (e) {
+                    myGameArea.x = e.pageX;
+                    myGameArea.y = e.pageY;
+                })
+                window.addEventListener('mouseup', function (e) {
+                    myGameArea.x = false;
+                    myGameArea.y = false;
+                    myGameArea.click = false;
+                })
+                window.addEventListener('touchstart', function (e) {
+                    myGameArea.x = e.pageX;
+                    myGameArea.y = e.pageY;
+                })
+                window.addEventListener('touchmove', function (e) {
+                    myGameArea.x = e.touches[0].screenX;
+                    myGameArea.y = e.touches[0].screenY;
+                })
+                window.addEventListener('touchend', function (e) {
+                    myGameArea.x = false;
+                    myGameArea.y = false;
+                })
+            },
+            clear: function () {
+                this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
+            }
+        }
+        function renderBlocks() {
+            var ctx = myGameArea.context;
+            for (var l = 0; l < blocks.length; l++) {
+                var rowDraw = Math.floor(l / width);
+                var tileDraw = l % width;
+                //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag. 
+                if ((tileDraw - xpos + 3) * 100 <= 800 && (tileDraw - xpos + 3) * 100 >= -100 && (rowDraw - ypos + 3) * 100 <= 800 && (rowDraw - ypos + 3) * 100 >= -100) {
+                    var imgs = new Image();
+                    switch (blocks[l]) {
+                        /* decides what to render. Each tile has 2-4 letter shorthand. syntax:
+                        case <shorthand>:
+                            imgs.src = <src>;
+                            break;
+                     */
+                    }
+                    ctx.drawImage(imgs, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
+                }
+            }
+        }
+
+        function left() {
+            if (walkable.includes(blocks[(Math.floor(ypos) * width) + Math.ceil(xpos + 0.125)]) && walkable.includes(blocks[(Math.ceil(ypos) * width) + Math.ceil(xpos + 0.125)])) {
+
+                xpos += 0.125;
+                if (xpos >= width - 1) {
+                    xpos = width - 1;
+                }
+            }
+        }
+        function right() {
+            if (walkable.includes(blocks[(Math.floor(ypos) * width) + Math.floor(xpos - 0.125)]) && walkable.includes(blocks[(Math.ceil(ypos) * width) + Math.floor(xpos - 0.125)])) {
+
+                xpos -= 0.125;
+                if (xpos <= 0) {
+                    xpos = 0;
+                }
+            }
+        }
+        function up() {
+            if (walkable.includes(blocks[(Math.floor(ypos - 0.125) * width) + Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - 0.125) * width) + Math.ceil(xpos)])) {
+
+                ypos -= 0.125;
+                if (ypos <= 0) {
+                    ypos = 0;
+                }
+            }
+        }
+        function down() {
+            if (walkable.includes(blocks[(Math.ceil(ypos + 0.125) * width) + Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + 0.125) * width) + Math.ceil(xpos)])) {
+
+                ypos += 0.125;
+                if (ypos >= height) {
+                    ypos = height;
+                }
+            }
+        }
+
+        function updateGameArea() {
+            myGameArea.clear();
+            if (screen == 0) {
+                var bImage = new Image();
+                bImage.src = '<title screen>'
+                myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
+                document.getElementById('player').style.opacity = 0;
+                if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
+                    loadTiles();
+                    screen = 1;
+                }
+            } else if (screen == 1) {
+
+                
+                    document.getElementById('player').style.opacity = 'inherit';
+                    if ((myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) || (myGameArea.x && myGameArea.x < 200 && myGameArea.click)) {
+                        right();
+                    }
+                    if ((myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[100] || myGameArea.keys[68])) || (myGameArea.x && myGameArea.x > 500 && myGameArea.click)) {
+                        left();
+                    }
+                    if ((myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) || (myGameArea.y && myGameArea.y < 200 && myGameArea.click)) {
+                        up();
+                    }
+                    if ((myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) || (myGameArea.y && myGameArea.y > 500 && myGameArea.click)) {
+                        down();
+                    }
+                //appropriate srcs
+                    if ((myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) || (myGameArea.x && myGameArea.x < 200 && myGameArea.click)) {
+                        if (document.getElementById('player').src != 'https://doomsdaygame.surge.sh/New%20Piskel%20(4).gif') {
+                            document.getElementById('player').src = 'New Piskel (4).gif';
+                        }
+                    } else if ((myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[100] || myGameArea.keys[68])) || (myGameArea.x && myGameArea.x > 500 && myGameArea.click)) {
+                        if (document.getElementById('player').src != 'https://doomsdaygame.surge.sh/New%20Piskel%20(5).gif') {
+                            document.getElementById('player').src = 'New Piskel (5).gif';
+
+                        }
+                    } else if ((myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) || (myGameArea.y && myGameArea.y < 200 && myGameArea.click)) {
+                        if (document.getElementById('player').src != 'https://doomsdaygame.surge.sh/New%20Piskel%20(7).gif') {
+                            document.getElementById('player').src = 'New Piskel (7).gif';
+
+                        }
+                    } else if ((myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) || (myGameArea.y && myGameArea.y > 500 && myGameArea.click)) {
+                        if (document.getElementById('player').src != 'https://doomsdaygame.surge.sh/New%20Piskel%20(6).gif') {
+                            document.getElementById('player').src = 'New Piskel (6).gif';
+
+                        }
+                    } else {
+                        document.getElementById('player').src = 'New Piskel (8).gif';
+                    }
+
+                    renderBlocks();
+                    
+                }
+           
+            }
+        </script>
+<canvas id="canvas"></canvas><img src="New Piskel (4).gif" id="player" />
+</body>
+</html>
