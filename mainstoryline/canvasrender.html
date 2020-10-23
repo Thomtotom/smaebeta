@@ -9,7 +9,6 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: -webkit-crisp-edges;
             image-rendering: pixelated;
-            image-rendering: crisp-edges;
             height: 100vh;
         }
 
@@ -19,7 +18,9 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: -webkit-crisp-edges;
             image-rendering: pixelated;
-            image-rendering: crisp-edges;
+        }
+        *{
+            margin: 0px;
         }
     </style>
 </head>
@@ -151,7 +152,7 @@
                         break;
                  */
                     }
-                    ctx.drawImage(imgs, dx * 32, dy * 32, 32, 32, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
+                    ctx.drawImage(imgs, dx * 128, dy * 128, 128, 128, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
                 }
             }
         }
@@ -266,7 +267,7 @@
 
         function drawFrame(frameX, frameY, canvasX, canvasY) {
             myGameArea.context.drawImage(img,
-                frameX * 32, frameY * 32, 32, 32,
+                frameX * 128, frameY * 128, 128, 128,
                 canvasX, canvasY, 100, 100);
         }</script>
     <script src="tileLoad.js"></script>
