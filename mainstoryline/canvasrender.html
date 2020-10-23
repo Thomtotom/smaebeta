@@ -12,7 +12,7 @@
             image-rendering: crisp-edges;
         }
 
-        img {
+        #player{
             transform: translate(-482px,-226px);
             width: 260px;
             image-rendering: -moz-crisp-edges;
@@ -24,33 +24,42 @@
 </head>
 <body onload="startGame()">
     <script>
-        var walkable = ['floor', 'tb', 'ep', 'com', 'mbt', 'epf', 'comf', 'mbtf', 'gh', 'ghf', 'sto', 'stof', 'tsh', 'tshf', 'gw', 'rw', 'yw', 'ls', 'lsf', 'w', 'wf'];
+        var walkable = ['g','d','t0'];
         var blocks = [];
         var screenNum = 0;
 //spawn, map size
-        var xpos = 17, ypos = 3, height = 32, width = 32;
-
-        function loadTiles() {
-            for (var row = 0; row < height; row++) {
-                for (var tile = 0; tile < width; tile++) {
-                    blocks[(width * row) + tile] = 'out';
-                }
-            }
-            //config map - use addDetail or extras
-        }
+        var xpos = 17, ypos = 4, height = 32, width = 32;
 
         function addDetail(xx, yy, src) {
             blocks[(yy * width) + xx] = src;
+        }
+        function fillAll(src) {
+            for (var row = 0; row < height; row++) {
+                for (var tile = 0; tile < width; tile++) {
+                    blocks[(width * row) + tile] = src;
+                }
+            }
+        }
+        function randompatch(cx, cy, r, src) {
+            for (var dx = cx - r; dx < cx + r; dx++) {
+                for (var dy = cy - r; dy < cy + r; dy++) {
+                    if (((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r - 1) || ((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r + 1 && Math.random() > 0.5)) {
+                        blocks[(dy * width) + dx] = src;
+                    }
+                }
+            }
         }
         function startGame() {
             myGameArea.start();
         }
         var myGameArea = {
+            keys: [],
             start: function () {
                 document.getElementById("canvas").width = 700;
                 document.getElementById("canvas").height = 700;
                 this.context = document.getElementById("canvas").getContext("2d");
                 this.interval = setInterval(updateGameArea, 50);
+                
                 window.addEventListener('keydown', function (e) {
                     myGameArea.keys = (myGameArea.keys || []);
                     myGameArea.keys[e.keyCode] = (e.type == "keydown");
@@ -97,14 +106,49 @@
                 //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag. 
                 if ((tileDraw - xpos + 3) * 100 <= 800 && (tileDraw - xpos + 3) * 100 >= -100 && (rowDraw - ypos + 3) * 100 <= 800 && (rowDraw - ypos + 3) * 100 >= -100) {
                     var imgs = new Image();
+                    imgs.src = 'tiles/tiles-1.png';
+                    var dx, dy;
                     switch (blocks[l]) {
-                        /* decides what to render. Each tile has 2-4 letter shorthand. syntax:
+                        case 'g':
+                            dx = 0;
+                            dy = 0;
+                            break;
+                        case 't0':
+                            dx = 1;
+                            dy = 0;
+                            break;
+                        case 't2':
+                            dx = 2;
+                            dy = 0;
+                            break;
+                        case 't3':
+                            dx = 3;
+                            dy = 0;
+                            break;
+                        case 't1':
+                            dx = 0;
+                            dy = 1;
+                            break;
+                        case 't4':
+                            dx = 1;
+                            dy = 1;
+                            break;
+                        case 'r':
+                            dx = 2;
+                            dy = 1;
+                            break;
+                        case 'd':
+                            dx = 3;
+                            dy = 1;
+                            break;
+                            /* decides what to render. Each tile has 2-4 letter shorthand. syntax:
                         case <shorthand>:
-                            imgs.src = <src>;
+                            dx = <xpos in sheet>;
+                            dy = <ypos in sheet>;
                             break;
                      */
                     }
-                    ctx.drawImage(imgs, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
+                    ctx.drawImage(imgs, dx * 32, dy * 32, 32, 32, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
                 }
             }
         }
@@ -148,16 +192,16 @@
 
         function updateGameArea() {
             myGameArea.clear();
-            if (screen == 0) {
+            if (screenNum == 0) {
                 var bImage = new Image();
-                bImage.src = '<title screen>'
+                bImage.src = '../frontpageandmainfiles/index.png'
                 myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
                 document.getElementById('player').style.opacity = 0;
                 if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
                     loadTiles();
-                    screen = 1;
+                    screenNum = 1;
                 }
-            } else if (screen == 1) {
+            } else if (screenNum == 1) {
 
                 
                     document.getElementById('player').style.opacity = 'inherit';
@@ -174,7 +218,7 @@
                         down();
                     }
                 //appropriate srcs
-                    if ((myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) || (myGameArea.x && myGameArea.x < 200 && myGameArea.click)) {
+                  /*  if ((myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) || (myGameArea.x && myGameArea.x < 200 && myGameArea.click)) {
                         if (document.getElementById('player').src != 'https://doomsdaygame.surge.sh/New%20Piskel%20(4).gif') {
                             document.getElementById('player').src = 'New Piskel (4).gif';
                         }
@@ -195,14 +239,14 @@
                         }
                     } else {
                         document.getElementById('player').src = 'New Piskel (8).gif';
-                    }
-
+                    }*/
                     renderBlocks();
                     
                 }
            
             }
         </script>
-<canvas id="canvas"></canvas><img src="New Piskel (4).gif" id="player" />
+    <script src="tileLoad.js"></script>
+<canvas id="canvas"></canvas><img src="https://doomsdaygame.surge.sh/New Piskel (4).gif" id="player" /><img src="tiles/tiles-1.png" />
 </body>
 </html>
