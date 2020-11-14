@@ -4,40 +4,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         canvas {
-            border: 1px solid #d3d3d3;
             background-color: #f1f1f1;
             image-rendering: -moz-crisp-edges;
             image-rendering: -webkit-crisp-edges;
-            image-rendering: pixelated;
-            height: 100vh;
-        }
-
-        #player {
-            transform: translate(-482px,-226px);
-            width: 260px;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
-            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+          /*image-rendering: pixelated;*/
+            height: 98vh;
         }
         *{
             margin: 0px;
+            padding: 0px;
         }
     </style>
 </head>
 <body onload="startGame()">
-    <script>var walkable = ['g', 'd', 't0'];
+    <script>
+        var maxClicks = {
+            r: 10,
+            t4: 5,
+            d: 3
+        };
+        var lim = {
+            r: [1, 2],
+            t4: [4, 7],
+            d: [1, 1]
+        };
+        var dropitem = {
+            r: ['s', [1, 2]],
+            t4: ['l', [4, 7]],
+            d: ['d', [1,1]]
+        };
+        var inventory = [];
+        var walkable = ['g', 'd', 't0'];
         var blocks = [];
         var screenNum = 0;
         //spawn, map size
-        var xpos = 17, ypos = 4, height = 32, width = 32;
+        var xpos = 50, ypos = 50, height = 100, width = 100;
 
         function addDetail(xx, yy, src) {
-            blocks[(yy * width) + xx] = src;
+            blocks[yy][xx] = src;
         }
         function fillAll(src) {
             for (var row = 0; row < height; row++) {
                 for (var tile = 0; tile < width; tile++) {
-                    blocks[(width * row) + tile] = src;
+                    blocks[width][tile] = src;
+                }
+            }
+        }
+        function fillRandom(k) {
+            var total = 0;
+            for (l in k) {
+                total += k[l][1];
+            }
+            for (var row = 0; row < height; row++) {
+                for (var tile = 0; tile < width; tile++) {
+                    var p = Math.random() * total, c = 0;
+                    for (m in k) {
+                        c += k[m][1]
+                        if (p < c) {
+                            blocks[row][tile] = k[m][0];
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -45,24 +73,46 @@
             for (var dx = cx - r; dx < cx + r; dx++) {
                 for (var dy = cy - r; dy < cy + r; dy++) {
                     if (((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r - 1) || ((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r + 1 && Math.random() > 0.5)) {
-                        blocks[(dy * width) + dx] = src;
+                        blocks[dy][dx] = src;
                     }
                 }
             }
         }
-
+        
         function startGame() {
             myGameArea.start();
+            for (var i = 0; i < height; i++) {
+                blocks[i] = [];
+            }
         }
         var myGameArea = {
             keys: [],
+            getc: function () {
+                return blocks[Math.floor(ypos + this.y / 100 - 3)][Math.floor(xpos + this.x / 100 - 3)];
+            },
+            setc: function (e) {
+                blocks[Math.floor(ypos + myGameArea.y / 100 - 3)][Math.floor(xpos + myGameArea.x / 100 - 3)] = e;
+            },
+            add: function (c, n) {
+                var p = 0;
+                for (var x = 0; x < inventory.length; x++) {
+                    if (inventory[x][0] == c) {
+                        inventory[x][1] += n;
+                        p = 1;
+                        break;
+                    }
+                }
+                if (p == 0) {
+                    inventory.push([c, n]);
+                }
+            },
             start: function () {
                 document.getElementById("canvas").width = 700;
                 document.getElementById("canvas").height = 700;
                 this.context = document.getElementById("canvas").getContext("2d");
                 img.src = 'player-sprite.png';
                 img.onload = function () {
-                    window.requestAnimationFrame(updateGameArea);
+                    setInterval(updateGameArea, 20);
                 };
                 window.addEventListener('keydown', function (e) {
                     myGameArea.keys = (myGameArea.keys || []);
@@ -72,13 +122,13 @@
                     myGameArea.keys[e.keyCode] = (e.type == "keydown");
                 })
                 window.addEventListener('mousedown', function (e) {
-                    myGameArea.x = e.clientX * 700 / window.innerHeight;
-                    myGameArea.y = e.clientY * 700 / window.innerHeight;
+                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
                     myGameArea.click = true;
                 })
                 window.addEventListener('mousemove', function (e) {
-                    myGameArea.x = e.clientX * 700 / window.innerHeight;
-                    myGameArea.y = e.clientY * 700 / window.innerHeight;
+                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
                 })
                 window.addEventListener('mouseup', function (e) {
                     myGameArea.x = false;
@@ -86,12 +136,12 @@
                     myGameArea.click = false;
                 })
                 window.addEventListener('touchstart', function (e) {
-                    myGameArea.x = e.clientX * 700 / window.innerHeight;
-                    myGameArea.y = e.clientY * 700 / window.innerHeight;
+                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
                 })
                 window.addEventListener('touchmove', function (e) {
-                    myGameArea.x = e.touches[0].clientX * 700 / window.innerHeight;
-                    myGameArea.y = e.touches[0].clientY * 700 / window.innerHeight;
+                    myGameArea.x = e.touches[0].clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.y = e.touches[0].clientY * 70000 / (98 * window.innerHeight);
                 })
                 window.addEventListener('touchend', function (e) {
                     myGameArea.x = false;
@@ -104,101 +154,115 @@
         }
         function renderBlocks() {
             var ctx = myGameArea.context;
-            for (var l = 0; l < blocks.length; l++) {
-                var rowDraw = Math.floor(l / width);
-                var tileDraw = l % width;
-                //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag.
-                if ((tileDraw - xpos + 3) * 100 <= 800 && (tileDraw - xpos + 3) * 100 >= -100 && (rowDraw - ypos + 3) * 100 <= 800 && (rowDraw - ypos + 3) * 100 >= -100) {
-                    var imgs = new Image();
-                    imgs.src = 'tiles/tiles-1.png';
-                    var dx, dy;
-                    switch (blocks[l]) {
-                        case 'g':
-                            dx = 0;
-                            dy = 0;
-                            break;
-                        case 't0':
-                            dx = 1;
-                            dy = 0;
-                            break;
-                        case 't2':
-                            dx = 2;
-                            dy = 0;
-                            break;
-                        case 't3':
-                            dx = 3;
-                            dy = 0;
-                            break;
-                        case 't1':
-                            dx = 0;
-                            dy = 1;
-                            break;
-                        case 't4':
-                            dx = 1;
-                            dy = 1;
-                            break;
-                        case 'r':
-                            dx = 2;
-                            dy = 1;
-                            break;
-                        case 'd':
-                            dx = 3;
-                            dy = 1;
-                            break;
-                        /* decides what to render. Each tile has 2-4 letter shorthand. syntax:
-                    case <shorthand>:
-                        dx = <xpos in sheet>;
-                        dy = <ypos in sheet>;
-                        break;
-                 */
+            for (var r = 0; r < blocks.length; r++) {
+                for (var c = 0; c < blocks.length; c++) {
+                    //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag.
+                    if ((c - xpos + 3) * 100 <= 800 && (c - xpos + 3) * 100 >= -100 && (r - ypos + 3) * 100 <= 800 && (r - ypos + 3) * 100 >= -100) {
+                        var imgs = new Image();
+                        imgs.src = 'tiles/tiles-1.png';
+                        var d = chooseBlock(blocks[r][c]);
+                        ctx.drawImage(imgs, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + 3) * 100, (r - ypos + 3) * 100, 100, 100);
                     }
-                    ctx.drawImage(imgs, dx * 128, dy * 128, 128, 128, (tileDraw - xpos + 3) * 100, (rowDraw - ypos + 3) * 100, 100, 100);
                 }
             }
         }
-
+        function chooseBlock(e) {
+            var dx, dy;
+            switch (e) {
+                case 'g':
+                    dx = 0;
+                    dy = 0;
+                    break;
+                case 't0':
+                    dx = 1;
+                    dy = 0;
+                    break;
+                case 't2':
+                    dx = 2;
+                    dy = 0;
+                    break;
+                case 't3':
+                    dx = 3;
+                    dy = 0;
+                    break;
+                case 't1':
+                    dx = 4;
+                    dy = 0;
+                    break;
+                case 't4':
+                    dx = 0;
+                    dy = 1;
+                    break;
+                case 'r':
+                    dx = 1;
+                    dy = 1;
+                    break;
+                case 'd':
+                    dx = 2;
+                    dy = 1;
+                    break;
+                case 'l':
+                    dx = 3;
+                    dy = 1;
+                    break;
+                case 's':
+                    dx = 4;
+                    dy = 1;
+                    break;
+                case 'p':
+                    dx = 0;
+                    dy = 2;
+                    break;
+                /* decides what to render. Each tile has 1-4 letter shorthand. syntax:
+                case <shorthand>:
+                    dx = <xpos in sheet>;
+                    dy = <ypos in sheet>;
+                    break;
+                */
+            }
+            return [dx, dy];
+        }
         function left() {
-            if (walkable.includes(blocks[(Math.floor(ypos) * width) + Math.ceil(xpos + 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos) * width) + Math.ceil(xpos + 0.0625)])) {
-
+            if (walkable.includes(blocks[(Math.floor(ypos))][Math.ceil(xpos + 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.ceil(xpos + 0.0625)])) {
                 xpos += 0.0625;
-                if (xpos >= width - 1) {
-                    xpos = width - 1;
+                if (xpos >= width - 4) {
+                    xpos = width - 4;
                 }
             }
         }
         function right() {
-            if (walkable.includes(blocks[(Math.floor(ypos) * width) + Math.floor(xpos - 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos) * width) + Math.floor(xpos - 0.0625)])) {
-
+            if (walkable.includes(blocks[(Math.floor(ypos))][Math.floor(xpos - 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.floor(xpos - 0.0625)])) {
                 xpos -= 0.0625;
-                if (xpos <= 0) {
-                    xpos = 0;
+                if (xpos <= 3) {
+                    xpos = 3;
                 }
             }
         }
         function up() {
-            if (walkable.includes(blocks[(Math.floor(ypos - 0.0625) * width) + Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - 0.0625) * width) + Math.ceil(xpos)])) {
-
+            if (walkable.includes(blocks[(Math.floor(ypos - 0.0625))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - 0.0625))][Math.ceil(xpos)])) {
                 ypos -= 0.0625;
-                if (ypos <= 0) {
-                    ypos = 0;
+                if (ypos <= 3) {
+                    ypos = 3;
                 }
             }
         }
         function down() {
-            if (walkable.includes(blocks[(Math.ceil(ypos + 0.0625) * width) + Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + 0.0625) * width) + Math.ceil(xpos)])) {
-
+            if (walkable.includes(blocks[(Math.ceil(ypos + 0.0625))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + 0.0625))][Math.ceil(xpos)])) {
                 ypos += 0.0625;
-                if (ypos >= height) {
-                    ypos = height;
+                if (ypos >= height - 4) {
+                    ypos = height - 4;
                 }
             }
         }
-
+        var lastClick = {
+            x: -1,
+            y: -1
+        }, clickCount = 1;
         function updateGameArea() {
             myGameArea.clear();
             if (screenNum == 0) {
                 var bImage = new Image();
-                bImage.src = '../frontpageandmainfiles/index.png'
+                bImage.src = '../frontpageandmainfiles/index wp.png'
                 myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
                 if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
                     loadTiles();
@@ -206,23 +270,35 @@
                 }
             } else if (screenNum == 1) {
                 let hasMoved = false;
-
-                if ((myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) || (myGameArea.x && myGameArea.x < 200 && myGameArea.click)) {
+                if (myGameArea.click && myGameArea.x < 700 && myGameArea.x > 0 && myGameArea.y < 700 && myGameArea.y > 0) {
+                    if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
+                        clickCount = 1;
+                    } else {
+                        clickCount += 1;
+                    }
+                    myGameArea.click = false;
+                    if (clickCount == maxClicks[myGameArea.getc()]) {
+                        myGameArea.add(dropitem[myGameArea.getc()][0], Math.floor(Math.random() * (dropitem[myGameArea.getc()][1][1] - dropitem[myGameArea.getc()][1][0] + 1)) + dropitem[myGameArea.getc()][1][0]);
+                        myGameArea.setc('g');
+                    }
+                    lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
+                    lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
+                }
+                if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) {
                     right();
                     currentDirection = FACING_LEFT;
 
                     hasMoved = true;
-                } else if ((myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[100] || myGameArea.keys[68])) || (myGameArea.x && myGameArea.x > 500 && myGameArea.click)) {
+                } else if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[100] || myGameArea.keys[68])) {
                     left();
                     hasMoved = true;
                     currentDirection = FACING_RIGHT;
-
                 }
-                if ((myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) || (myGameArea.y && myGameArea.y < 200 && myGameArea.click)) {
+                if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) {
                     currentDirection = FACING_UP;
                     up();
                     hasMoved = true;
-                } else if ((myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) || (myGameArea.y && myGameArea.y > 500 && myGameArea.click)) {
+                } else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) {
                     down();
                     hasMoved = true;
                     currentDirection = FACING_DOWN;
@@ -244,10 +320,38 @@
                 renderBlocks();
 
                 drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, 300, 300);
-                console.log('?')
+                if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
+                    screenNum = 2;
+                    myGameArea.keys[101] = false;
+                    myGameArea.keys[69] = false;
+                }
+            } else if (screenNum == 2) {
+                if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101]))) {
+                    screenNum = 1;
+                    myGameArea.keys[101] = false;
+                    myGameArea.keys[69] = false;
+                }
+                myGameArea.context.fillStyle = '#000066';
+                myGameArea.context.fillRect(0, 0, 700, 700);
+                for (var x = 0; x < inventory.length; x++) {
+                    var gx = chooseBlock(inventory[x][0])[0] * 32, gy = chooseBlock(inventory[x][0])[1] * 32;
+                    var img = new Image();
+                    img.src = 'tiles/tiles-1.png';
+                    myGameArea.context.fillStyle = 'grey';
+                    myGameArea.context.fillRect(50 + (56 * x), 50, 56, 56);
+                    myGameArea.context.fillStyle = 'black';
+                    myGameArea.context.moveTo(52 + (56 * x), 52);
+                    myGameArea.context.lineTo(104 + (56 * x), 52);
+                    myGameArea.context.lineTo(104 + (56 * x), 104);
+                    myGameArea.context.lineTo(52 + (56 * x), 104);
+                    myGameArea.context.lineTo(52 + (56 * x), 52);
+                    myGameArea.context.stroke();
+                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * x), 53, 50, 50);
+                    myGameArea.context.font = '15px Arial';
+                    myGameArea.context.fillStyle = 'white';
+                    myGameArea.context.fillText(inventory[x][1], 80 + x * 50, 80);
+                }
             }
-            window.requestAnimationFrame(updateGameArea);
-
         }
         const CYCLE_LOOP = [0, 1, 0, 2];
         const FACING_DOWN = 2;
@@ -269,7 +373,8 @@
             myGameArea.context.drawImage(img,
                 frameX * 128, frameY * 128, 128, 128,
                 canvasX, canvasY, 100, 100);
-        }</script>
+        }
+    </script>
     <script src="tileLoad.js"></script>
     <canvas id="canvas"></canvas>
 </body>
