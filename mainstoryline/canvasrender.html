@@ -8,18 +8,18 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: -webkit-crisp-edges;
             image-rendering: crisp-edges;
-          /*image-rendering: pixelated;*/
+            /*image-rendering: pixelated;*/
             height: 98vh;
         }
-        *{
+
+        * {
             margin: 0px;
             padding: 0px;
         }
     </style>
 </head>
 <body onload="startGame()">
-    <script>
-        var maxClicks = {
+    <script>var maxClicks = {
             r: 10,
             t4: 5,
             d: 3
@@ -32,8 +32,11 @@
         var dropitem = {
             r: ['s', [1, 2]],
             t4: ['l', [4, 7]],
-            d: ['d', [1,1]]
+            d: ['d', [1, 1]]
         };
+        var recipes = [
+            [['p', 4], [['l', 1]]],
+        ];
         var inventory = [];
         var walkable = ['g', 'd', 't0'];
         var blocks = [];
@@ -78,12 +81,13 @@
                 }
             }
         }
-        
+
         function startGame() {
             myGameArea.start();
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
             }
+            myGameArea.context.imageSmoothingEnabled = false;
         }
         var myGameArea = {
             keys: [],
@@ -349,7 +353,43 @@
                     myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * x), 53, 50, 50);
                     myGameArea.context.font = '15px Arial';
                     myGameArea.context.fillStyle = 'white';
-                    myGameArea.context.fillText(inventory[x][1], 80 + x * 50, 80);
+                    myGameArea.context.fillText(inventory[x][1], 80 + x * 50, 100);
+                }
+                //inventory[p][1] >= recipes[x][1][m][1]
+                var arec = [];
+                for (var x = 0; x < recipes.length; x++) {
+                    var o = 0;
+                    for (var m = 0; m < recipes[x][1].length; m++) {
+                        var t = [];
+                        for (var p = 0; p < inventory.length; p++) {
+                            t.push(inventory[p][0]);
+                        }
+                        if (t.indexOf(recipes[x][1][m][0]) == -1 || inventory[t.indexOf(recipes[x][1][m][0])][1] < recipes[x][1][m][1]) {
+                            o = 1;
+                            console.log(t, recipes[x][1][m][0])
+                        }
+                    }
+                    if (o == 0) {
+                        arec.push(recipes[x][0][0]);
+                    }
+                }
+                for (var q in arec) {
+                    var gx = chooseBlock(recipes[q][0][0])[0] * 32, gy = chooseBlock(recipes[q][0][0])[1] * 32;
+                    var img = new Image();
+                    img.src = 'tiles/tiles-1.png';
+                    myGameArea.context.fillStyle = 'grey';
+                    myGameArea.context.fillRect(50 + (56 * (q % 8)), 250 + 56 * Math.floor(q/8), 56, 56);
+                    myGameArea.context.fillStyle = 'black';
+                    myGameArea.context.moveTo(52 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
+                    myGameArea.context.lineTo(104 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
+                    myGameArea.context.lineTo(104 + (56 * (q % 8)), 304 + 56 * Math.floor(q / 8));
+                    myGameArea.context.lineTo(52 + (56 * (q % 8)), 304 + 56 * Math.floor(q / 8));
+                    myGameArea.context.lineTo(52 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
+                    myGameArea.context.stroke();
+                    myGameArea.context.font = '15px Arial';
+                    myGameArea.context.fillStyle = 'white';
+                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * q), 253, 50, 50);
+                    myGameArea.context.fillText(recipes[q][0][1], 80 + (q % 8) * 50, 300 + 50 * Math.floor(q / 8));
                 }
             }
         }
@@ -367,8 +407,6 @@
         let positionX = 0;
         let positionY = 0;
         let img = new Image();
-
-
         function drawFrame(frameX, frameY, canvasX, canvasY) {
             myGameArea.context.drawImage(img,
                 frameX * 128, frameY * 128, 128, 128,
