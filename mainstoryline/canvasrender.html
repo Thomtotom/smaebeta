@@ -19,7 +19,8 @@
     </style>
 </head>
 <body onload="startGame()">
-    <script>var maxClicks = {
+    <script>
+        var maxClicks = {
             r: 10,
             t4: 5,
             d: 3
@@ -36,8 +37,14 @@
         };
         var recipes = [
             [['p', 4], [['l', 1]]],
+            [['st',4],[['p', 2]]],
+            [['sw', 1], [['s', 5], ['st', 10]]],
+            [['px', 1], [['s', 5], ['st', 10]]],
+            [['x', 1], [['s', 5], ['st', 10]]],
+            [['bx', 1], [['s', 10], ['st', 10]]],
+
         ];
-        var inventory = [];
+        var inventory = [], selectIndex = 0;
         var walkable = ['g', 'd', 't0'];
         var blocks = [];
         var screenNum = 0;
@@ -114,8 +121,8 @@
                 document.getElementById("canvas").width = 700;
                 document.getElementById("canvas").height = 700;
                 this.context = document.getElementById("canvas").getContext("2d");
-                img.src = 'player-sprite.png';
-                img.onload = function () {
+                imgp.src = 'player.png';
+                imgp.onload = function () {
                     setInterval(updateGameArea, 20);
                 };
                 window.addEventListener('keydown', function (e) {
@@ -201,7 +208,7 @@
                     dx = 1;
                     dy = 1;
                     break;
-                case 'd':
+                case 'sw':
                     dx = 2;
                     dy = 1;
                     break;
@@ -215,6 +222,22 @@
                     break;
                 case 'p':
                     dx = 0;
+                    dy = 2;
+                    break;
+                case 'st':
+                    dx = 1;
+                    dy = 2;
+                    break;
+                case 'px':
+                    dx = 2;
+                    dy = 2;
+                    break;
+                case 'x':
+                    dx = 3;
+                    dy = 2;
+                    break;
+                case 'bx':
+                    dx = 4;
                     dy = 2;
                     break;
                 /* decides what to render. Each tile has 1-4 letter shorthand. syntax:
@@ -299,13 +322,11 @@
                     currentDirection = FACING_RIGHT;
                 }
                 if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) {
-                    currentDirection = FACING_UP;
                     up();
                     hasMoved = true;
                 } else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) {
                     down();
                     hasMoved = true;
-                    currentDirection = FACING_DOWN;
                 }
                 if (hasMoved) {
                     frameCount++;
@@ -324,6 +345,32 @@
                 renderBlocks();
 
                 drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, 300, 300);
+                var aitelm = [];
+                for (var a = 0; a < inventory.length; a++) {
+                    if (inventory[a][1] > 0) {
+                        aitelm.push(inventory[a]);
+                    }
+                }
+                for (var w = 0; w < 7; w++) {
+                    myGameArea.context.fillStyle = (w == selectIndex ? 'gold' : 'grey');
+                    myGameArea.context.fillRect(70 + (80 * w), 600, 80, 80);
+                    /*myGameArea.context.fillStyle = 'black';
+                    myGameArea.context.moveTo(52 + (56 * y), 52);
+                    myGameArea.context.lineTo(104 + (56 * y), 52);
+                    myGameArea.context.lineTo(104 + (56 * y), 104);
+                    myGameArea.context.lineTo(52 + (56 * y), 104);
+                    myGameArea.context.lineTo(52 + (56 * y), 52);
+                    myGameArea.context.stroke();*/
+                    if (aitelm[w]) {
+                        var gx = chooseBlock(aitelm[w][0])[0] * 32, gy = chooseBlock(aitelm[w][0])[1] * 32;
+                        var img = new Image();
+                        img.src = 'tiles/tiles-1.png';
+                        myGameArea.context.drawImage(img, gx, gy, 32, 32, 75 + (80 * w), 605, 70, 70);
+                        myGameArea.context.font = '20px Arial';
+                        myGameArea.context.fillStyle = 'white';
+                        myGameArea.context.fillText(aitelm[w][1], 105 + w * 80, 675);
+                    }
+                }
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
@@ -337,26 +384,31 @@
                 }
                 myGameArea.context.fillStyle = '#000066';
                 myGameArea.context.fillRect(0, 0, 700, 700);
+                var aitem = [];
                 for (var x = 0; x < inventory.length; x++) {
-                    var gx = chooseBlock(inventory[x][0])[0] * 32, gy = chooseBlock(inventory[x][0])[1] * 32;
+                    if (inventory[x][1] > 0) {
+                        aitem.push(inventory[x]);
+                    }
+                }
+                for (var y in aitem) {
+                    var gx = chooseBlock(aitem[y][0])[0] * 32, gy = chooseBlock(aitem[y][0])[1] * 32;
                     var img = new Image();
                     img.src = 'tiles/tiles-1.png';
-                    myGameArea.context.fillStyle = 'grey';
-                    myGameArea.context.fillRect(50 + (56 * x), 50, 56, 56);
-                    myGameArea.context.fillStyle = 'black';
-                    myGameArea.context.moveTo(52 + (56 * x), 52);
-                    myGameArea.context.lineTo(104 + (56 * x), 52);
-                    myGameArea.context.lineTo(104 + (56 * x), 104);
-                    myGameArea.context.lineTo(52 + (56 * x), 104);
-                    myGameArea.context.lineTo(52 + (56 * x), 52);
-                    myGameArea.context.stroke();
-                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * x), 53, 50, 50);
+                    myGameArea.context.fillStyle = (y <= 6?'gold':'grey');
+                    myGameArea.context.fillRect(50 + (56 * y), 50, 56, 56);
+                    /*myGameArea.context.fillStyle = 'black';
+                    myGameArea.context.moveTo(52 + (56 * y), 52);
+                    myGameArea.context.lineTo(104 + (56 * y), 52);
+                    myGameArea.context.lineTo(104 + (56 * y), 104);
+                    myGameArea.context.lineTo(52 + (56 * y), 104);
+                    myGameArea.context.lineTo(52 + (56 * y), 52);
+                    myGameArea.context.stroke();*/
+                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * y), 53, 50, 50);
                     myGameArea.context.font = '15px Arial';
                     myGameArea.context.fillStyle = 'white';
-                    myGameArea.context.fillText(inventory[x][1], 80 + x * 50, 100);
+                    myGameArea.context.fillText(aitem[y][1], 80 + y * 56, 100);
                 }
-                //inventory[p][1] >= recipes[x][1][m][1]
-                var arec = [];
+                var arec = [], arecc = [];
                 for (var x = 0; x < recipes.length; x++) {
                     var o = 0;
                     for (var m = 0; m < recipes[x][1].length; m++) {
@@ -366,50 +418,64 @@
                         }
                         if (t.indexOf(recipes[x][1][m][0]) == -1 || inventory[t.indexOf(recipes[x][1][m][0])][1] < recipes[x][1][m][1]) {
                             o = 1;
-                            console.log(t, recipes[x][1][m][0])
                         }
                     }
                     if (o == 0) {
                         arec.push(recipes[x][0][0]);
+                        arecc.push(recipes[x]);
                     }
                 }
                 for (var q in arec) {
-                    var gx = chooseBlock(recipes[q][0][0])[0] * 32, gy = chooseBlock(recipes[q][0][0])[1] * 32;
+                    var gx = chooseBlock(arecc[q][0][0])[0] * 32, gy = chooseBlock(arecc[q][0][0])[1] * 32;
                     var img = new Image();
                     img.src = 'tiles/tiles-1.png';
                     myGameArea.context.fillStyle = 'grey';
-                    myGameArea.context.fillRect(50 + (56 * (q % 8)), 250 + 56 * Math.floor(q/8), 56, 56);
-                    myGameArea.context.fillStyle = 'black';
-                    myGameArea.context.moveTo(52 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
-                    myGameArea.context.lineTo(104 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
-                    myGameArea.context.lineTo(104 + (56 * (q % 8)), 304 + 56 * Math.floor(q / 8));
-                    myGameArea.context.lineTo(52 + (56 * (q % 8)), 304 + 56 * Math.floor(q / 8));
-                    myGameArea.context.lineTo(52 + (56 * (q % 8)), 252 + 56 * Math.floor(q / 8));
-                    myGameArea.context.stroke();
+                    myGameArea.context.fillRect(50 + (56 * (q % 10)), 250 + 56 * Math.floor(q/10), 56, 56);
+                    /*myGameArea.context.fillStyle = 'black';
+                    myGameArea.context.moveTo(52 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
+                    myGameArea.context.lineTo(104 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
+                    myGameArea.context.lineTo(104 + (56 * (q % 10)), 304 + 56 * Math.floor(q / 10));
+                    myGameArea.context.lineTo(52 + (56 * (q % 10)), 304 + 56 * Math.floor(q / 10));
+                    myGameArea.context.lineTo(52 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
+                    myGameArea.context.stroke();*/
                     myGameArea.context.font = '15px Arial';
                     myGameArea.context.fillStyle = 'white';
-                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * q), 253, 50, 50);
-                    myGameArea.context.fillText(recipes[q][0][1], 80 + (q % 8) * 50, 300 + 50 * Math.floor(q / 8));
+                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * (q % 10)), 253 + 56 * Math.floor(q / 10), 50, 50);
+                    myGameArea.context.fillText(arecc[q][0][1], 80 + (q % 10) * 56, 300 + 56 * Math.floor(q / 10));
+                }
+                if (myGameArea.click && myGameArea.x < 610 && myGameArea.y > 250 && myGameArea.x > 50) {
+                    myGameArea.click = false;
+                    if (arec[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)]) {
+                        var t = [];
+                        for (var p = 0; p < inventory.length; p++) {
+                            t.push(inventory[p][0]);
+                        }
+                        for (r in arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1]) {
+                            inventory[t.indexOf(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0])][1] -= arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][1];
+                            arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r];
+                        }
+                        myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][0], arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][1]);
+                    }
                 }
             }
         }
-        const CYCLE_LOOP = [0, 1, 0, 2];
-        const FACING_DOWN = 2;
-        const FACING_UP = 0;
-        const FACING_LEFT = 3;
+        const CYCLE_LOOP = [0, 1, 2, 3,4,5];
+        const FACING_LEFT = 0;
         const FACING_RIGHT = 1;
-        const FRAME_LIMIT = 12;
+        const FRAME_LIMIT = 5;
 
 
-        let currentDirection = FACING_DOWN;
+        let currentDirection = FACING_RIGHT;
+
         let currentLoopIndex = 0;
         let frameCount = 0;
         let positionX = 0;
         let positionY = 0;
-        let img = new Image();
+
+        let imgp = new Image();
         function drawFrame(frameX, frameY, canvasX, canvasY) {
-            myGameArea.context.drawImage(img,
-                frameX * 128, frameY * 128, 128, 128,
+            myGameArea.context.drawImage(imgp,
+                frameX * 32, frameY * 32, 32, 32,
                 canvasX, canvasY, 100, 100);
         }
     </script>
