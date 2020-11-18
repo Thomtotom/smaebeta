@@ -20,20 +20,19 @@
 </head>
 <body onload="startGame()">
     <script>
+        var placable = [['l','lp'],['fb','fb']]
+        var invIndex = -1;
         var maxClicks = {
-            r: 10,
-            t4: 5,
-            d: 3
-        };
-        var lim = {
-            r: [1, 2],
-            t4: [4, 7],
-            d: [1, 1]
+            r: { def: 10, px: 4},
+            t4: { def: 5, x: 2 },
+            lp: { def: 5, x: 2 },
+            fb: { def: 5, x: 2 },
         };
         var dropitem = {
-            r: ['s', [1, 2]],
-            t4: ['l', [4, 7]],
-            d: ['d', [1, 1]]
+            r: { def: ['s', [1, 2]] },
+            t4: { def: ['l', [4, 7]] },
+            lp: { def: ['l', [1, 1]] },
+            fb: { def: ['fb',[1, 1]] },
         };
         var recipes = [
             [['p', 4], [['l', 1]]],
@@ -42,14 +41,14 @@
             [['px', 1], [['s', 5], ['st', 10]]],
             [['x', 1], [['s', 5], ['st', 10]]],
             [['bx', 1], [['s', 10], ['st', 10]]],
-
+            [['fb', 1], [['p', 4]]],
         ];
         var inventory = [], selectIndex = 0;
-        var walkable = ['g', 'd', 't0'];
+        var walkable = ['g', 'd', 't0','fb'];
         var blocks = [];
         var screenNum = 0;
         //spawn, map size
-        var xpos = 50, ypos = 50, height = 100, width = 100;
+        var xpos = 500, ypos = 500, height = 1000, width = 1000;
 
         function addDetail(xx, yy, src) {
             blocks[yy][xx] = src;
@@ -166,7 +165,7 @@
         function renderBlocks() {
             var ctx = myGameArea.context;
             for (var r = 0; r < blocks.length; r++) {
-                for (var c = 0; c < blocks.length; c++) {
+                for (var c = 0; c < blocks[r].length; c++) {
                     //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag.
                     if ((c - xpos + 3) * 100 <= 800 && (c - xpos + 3) * 100 >= -100 && (r - ypos + 3) * 100 <= 800 && (r - ypos + 3) * 100 >= -100) {
                         var imgs = new Image();
@@ -240,6 +239,14 @@
                     dx = 4;
                     dy = 2;
                     break;
+                case 'lp':
+                    dx = 0;
+                    dy = 3;
+                    break;
+                case 'fb':
+                    dx = 1;
+                    dy = 3;
+                    break;
                 /* decides what to render. Each tile has 1-4 letter shorthand. syntax:
                 case <shorthand>:
                     dx = <xpos in sheet>;
@@ -297,19 +304,45 @@
                 }
             } else if (screenNum == 1) {
                 let hasMoved = false;
+                var aitelm = [];
+                for (var b = 0; b < inventory.length; b++) {
+                    if (inventory[b][1] > 0) {
+                        aitelm.push(inventory[b]);
+                    }
+                }
+                var placabli = [];
+                for (var e = 0; e < placable.length; e++) {
+                    placabli.push(placable[e][0]);
+                }
                 if (myGameArea.click && myGameArea.x < 700 && myGameArea.x > 0 && myGameArea.y < 700 && myGameArea.y > 0) {
-                    if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
-                        clickCount = 1;
+                    if (myGameArea.x > 70 && myGameArea.x < 630 && myGameArea.y > 600 && myGameArea.y < 680) {
+                        selectIndex = Math.floor((myGameArea.x - 70) / 80);
                     } else {
-                        clickCount += 1;
+                        myGameArea.click = false;
+                        if (myGameArea.getc() == 'g') {
+                            if (placabli.includes(aitelm[selectIndex] ? (aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no') : 'no')) {
+                                myGameArea.setc(placable[placabli.indexOf(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no')][1]);
+                                myGameArea.add(aitelm[selectIndex][0], -1);
+                            }
+                        } else {
+                            //console.log(myGameArea.getc(), placabli.includes(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no'))
+                            if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
+                                clickCount = 1;
+                            } else {
+                                clickCount += 1;
+                            }
+                            myGameArea.click = false;
+                            var a = aitelm[selectIndex] ? aitelm[selectIndex] : 'def';
+                            var mq = maxClicks[myGameArea.getc()][a[0]] ? maxClicks[myGameArea.getc()][a[0]] : maxClicks[myGameArea.getc()]['def'];
+                            var dq = dropitem[myGameArea.getc()][a[0]] ? a[0] : 'def';
+                            if (clickCount == mq) {
+                                myGameArea.add(dropitem[myGameArea.getc()][dq][0], Math.floor(Math.random() * (dropitem[myGameArea.getc()][dq][1][1] - dropitem[myGameArea.getc()][dq][1][0] + 1)) + dropitem[myGameArea.getc()][dq][1][0]);
+                                myGameArea.setc('g');
+                            }
+                            lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
+                            lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
+                        }
                     }
-                    myGameArea.click = false;
-                    if (clickCount == maxClicks[myGameArea.getc()]) {
-                        myGameArea.add(dropitem[myGameArea.getc()][0], Math.floor(Math.random() * (dropitem[myGameArea.getc()][1][1] - dropitem[myGameArea.getc()][1][0] + 1)) + dropitem[myGameArea.getc()][1][0]);
-                        myGameArea.setc('g');
-                    }
-                    lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
-                    lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
                 }
                 if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) {
                     right();
@@ -345,12 +378,6 @@
                 renderBlocks();
 
                 drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, 300, 300);
-                var aitelm = [];
-                for (var a = 0; a < inventory.length; a++) {
-                    if (inventory[a][1] > 0) {
-                        aitelm.push(inventory[a]);
-                    }
-                }
                 for (var w = 0; w < 7; w++) {
                     myGameArea.context.fillStyle = (w == selectIndex ? 'gold' : 'grey');
                     myGameArea.context.fillRect(70 + (80 * w), 600, 80, 80);
@@ -381,6 +408,7 @@
                     screenNum = 1;
                     myGameArea.keys[101] = false;
                     myGameArea.keys[69] = false;
+                    invIndex = -1;
                 }
                 myGameArea.context.fillStyle = '#000066';
                 myGameArea.context.fillRect(0, 0, 700, 700);
@@ -390,19 +418,12 @@
                         aitem.push(inventory[x]);
                     }
                 }
-                for (var y in aitem) {
+                for (var y = 0; y < aitem.length; y++) {
                     var gx = chooseBlock(aitem[y][0])[0] * 32, gy = chooseBlock(aitem[y][0])[1] * 32;
                     var img = new Image();
                     img.src = 'tiles/tiles-1.png';
-                    myGameArea.context.fillStyle = (y <= 6?'gold':'grey');
+                    myGameArea.context.fillStyle = (y != invIndex ? (y <= 6?'gold':'grey') : 'orange');
                     myGameArea.context.fillRect(50 + (56 * y), 50, 56, 56);
-                    /*myGameArea.context.fillStyle = 'black';
-                    myGameArea.context.moveTo(52 + (56 * y), 52);
-                    myGameArea.context.lineTo(104 + (56 * y), 52);
-                    myGameArea.context.lineTo(104 + (56 * y), 104);
-                    myGameArea.context.lineTo(52 + (56 * y), 104);
-                    myGameArea.context.lineTo(52 + (56 * y), 52);
-                    myGameArea.context.stroke();*/
                     myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * y), 53, 50, 50);
                     myGameArea.context.font = '15px Arial';
                     myGameArea.context.fillStyle = 'white';
@@ -431,17 +452,30 @@
                     img.src = 'tiles/tiles-1.png';
                     myGameArea.context.fillStyle = 'grey';
                     myGameArea.context.fillRect(50 + (56 * (q % 10)), 250 + 56 * Math.floor(q/10), 56, 56);
-                    /*myGameArea.context.fillStyle = 'black';
-                    myGameArea.context.moveTo(52 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
-                    myGameArea.context.lineTo(104 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
-                    myGameArea.context.lineTo(104 + (56 * (q % 10)), 304 + 56 * Math.floor(q / 10));
-                    myGameArea.context.lineTo(52 + (56 * (q % 10)), 304 + 56 * Math.floor(q / 10));
-                    myGameArea.context.lineTo(52 + (56 * (q % 10)), 252 + 56 * Math.floor(q / 10));
-                    myGameArea.context.stroke();*/
                     myGameArea.context.font = '15px Arial';
                     myGameArea.context.fillStyle = 'white';
                     myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * (q % 10)), 253 + 56 * Math.floor(q / 10), 50, 50);
                     myGameArea.context.fillText(arecc[q][0][1], 80 + (q % 10) * 56, 300 + 56 * Math.floor(q / 10));
+                }
+                if (myGameArea.click && myGameArea.x > 50 && myGameArea.x < 610 && myGameArea.y > 50 && myGameArea.y < 208) {
+                    if (aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)]) {
+                        if (invIndex == -1 || !aitem[invIndex]) {
+                            invIndex = Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56);
+                        } else {
+                            var f = [];
+                            for (var p = 0; p < inventory.length; p++) {
+                                f.push(inventory[p][0]);
+                            }
+                            var h = inventory[f.indexOf(aitem[invIndex][0])];
+                            inventory[f.indexOf(aitem[invIndex][0])] = inventory[f.indexOf(aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])];
+                            inventory[f.indexOf(aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])] = h;
+                            myGameArea.click = false;
+                        }
+                    } else {
+                        invIndex = -1;
+                    }
+                } else if (myGameArea.click) {
+                    invIndex = -1;
                 }
                 if (myGameArea.click && myGameArea.x < 610 && myGameArea.y > 250 && myGameArea.x > 50) {
                     myGameArea.click = false;
