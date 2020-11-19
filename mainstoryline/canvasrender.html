@@ -20,19 +20,25 @@
 </head>
 <body onload="startGame()">
     <script>
+        var speed = 0.0625;
         var placable = [['l','lp'],['fb','fb']]
         var invIndex = -1;
         var maxClicks = {
             r: { def: 10, px: 4},
-            t4: { def: 5, x: 2 },
-            lp: { def: 5, x: 2 },
-            fb: { def: 5, x: 2 },
+            t4: { def: 10, x: 4 },
+            lp: { def: 4, x: 2 },
+            fb: { def: 4, x: 2 },
         };
         var dropitem = {
             r: { def: ['s', [1, 2]] },
             t4: { def: ['l', [4, 7]] },
             lp: { def: ['l', [1, 1]] },
             fb: { def: ['fb',[1, 1]] },
+        };
+        var defaultTile = {
+            forest: 'g',
+            mountain: 'sr',
+            desert: 'ds',
         };
         var recipes = [
             [['p', 4], [['l', 1]]],
@@ -44,10 +50,55 @@
             [['fb', 1], [['p', 4]]],
         ];
         var inventory = [], selectIndex = 0;
-        var walkable = ['g', 'd', 't0','fb'];
+        var walkable = ['g', 't0','fb','sr','ds'];
         var blocks = [];
         var screenNum = 0;
         //spawn, map size
+        function loadTiles() {
+            generateBiomes();
+            for (var o = 0; o < height; o++) {
+                for (var j = 0; j < width; j++) {
+                    blocks[o][j] = biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr':'ds');
+                }
+            }
+
+        }
+        var biomes = [];
+        function generateBiomes() {
+            var colors = ['#ffff99', 'grey'];
+            var cs = document.createElement("CANVAS");
+            cs.width = 1000;
+            cs.height = 1000;
+            var ctx = cs.getContext("2d");
+            var l = 100;
+            ctx.fillStyle = 'green';
+            ctx.fillRect(0, 0, 1000, 1000);
+            for (var k = 0; k < 12; k++) {
+                var dx = Math.random() * 1000; dy = Math.random() * 1000;
+                l = 200;
+                ctx.beginPath();
+                ctx.fillStyle = colors[k % colors.length];
+                ctx.moveTo(dx, dy);
+                for (var m = 0; m < 340; m++) {
+                    l += (Math.random() * 10) - 5;
+                    ctx.lineTo(dx + l * Math.cos(m * Math.PI / 180), dy + l * Math.sin(m * Math.PI / 180));
+                }
+                ctx.lineTo(dx + 200, dy);
+                ctx.fill();
+            }
+            var c = ctx.getImageData(0, 0, 1000, 1000).data;
+            for (var i = 0; i < c.length; i += 4) {
+                if (c[i] == 0 && c[i + 1] == 128 && c[i + 2] == 0) {
+                    biomes.push('forest');
+                } else if (c[i] == 255 && c[i + 1] == 255 && c[i + 2] == 153) {
+                    biomes.push('desert');
+                } else if (c[i] == 128 && c[i + 1] == 128 && c[i + 2] == 128) {
+                    biomes.push('mountain');
+                } else {
+                    biomes.push('forest');
+                }
+            }
+        }
         var xpos = 500, ypos = 500, height = 1000, width = 1000;
 
         function addDetail(xx, yy, src) {
@@ -69,7 +120,7 @@
                 for (var tile = 0; tile < width; tile++) {
                     var p = Math.random() * total, c = 0;
                     for (m in k) {
-                        c += k[m][1]
+                        c += k[m][1];
                         if (p < c) {
                             blocks[row][tile] = k[m][0];
                             break;
@@ -164,15 +215,13 @@
         }
         function renderBlocks() {
             var ctx = myGameArea.context;
-            for (var r = 0; r < blocks.length; r++) {
-                for (var c = 0; c < blocks[r].length; c++) {
+            for (var r = Math.floor(ypos) - 5; r < Math.floor(ypos) + 5; r++) {
+                for (var c = Math.floor(xpos) - 5; c < Math.floor(xpos) + 5; c++) {
                     //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag.
-                    if ((c - xpos + 3) * 100 <= 800 && (c - xpos + 3) * 100 >= -100 && (r - ypos + 3) * 100 <= 800 && (r - ypos + 3) * 100 >= -100) {
-                        var imgs = new Image();
-                        imgs.src = 'tiles/tiles-1.png';
-                        var d = chooseBlock(blocks[r][c]);
-                        ctx.drawImage(imgs, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + 3) * 100, (r - ypos + 3) * 100, 100, 100);
-                    }
+                    var imgs = new Image();
+                    imgs.src = 'tiles/tiles-1.png';
+                    var d = chooseBlock(blocks[r][c]);
+                    ctx.drawImage(imgs, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + 3) * 100, (r - ypos + 3) * 100, 100, 100);
                 }
             }
         }
@@ -247,6 +296,14 @@
                     dx = 1;
                     dy = 3;
                     break;
+                case 'ds':
+                    dx = 2;
+                    dy = 3;
+                    break;
+                case 'sr':
+                    dx = 3;
+                    dy = 3;
+                    break;
                 /* decides what to render. Each tile has 1-4 letter shorthand. syntax:
                 case <shorthand>:
                     dx = <xpos in sheet>;
@@ -257,32 +314,32 @@
             return [dx, dy];
         }
         function left() {
-            if (walkable.includes(blocks[(Math.floor(ypos))][Math.ceil(xpos + 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.ceil(xpos + 0.0625)])) {
-                xpos += 0.0625;
+            if (walkable.includes(blocks[(Math.floor(ypos))][Math.ceil(xpos + speed)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.ceil(xpos + speed)])) {
+                xpos += speed;
                 if (xpos >= width - 4) {
                     xpos = width - 4;
                 }
             }
         }
         function right() {
-            if (walkable.includes(blocks[(Math.floor(ypos))][Math.floor(xpos - 0.0625)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.floor(xpos - 0.0625)])) {
-                xpos -= 0.0625;
+            if (walkable.includes(blocks[(Math.floor(ypos))][Math.floor(xpos - speed)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.floor(xpos - speed)])) {
+                xpos -= speed;
                 if (xpos <= 3) {
                     xpos = 3;
                 }
             }
         }
         function up() {
-            if (walkable.includes(blocks[(Math.floor(ypos - 0.0625))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - 0.0625))][Math.ceil(xpos)])) {
-                ypos -= 0.0625;
+            if (walkable.includes(blocks[(Math.floor(ypos - speed))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - speed))][Math.ceil(xpos)])) {
+                ypos -= speed;
                 if (ypos <= 3) {
                     ypos = 3;
                 }
             }
         }
         function down() {
-            if (walkable.includes(blocks[(Math.ceil(ypos + 0.0625))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + 0.0625))][Math.ceil(xpos)])) {
-                ypos += 0.0625;
+            if (walkable.includes(blocks[(Math.ceil(ypos + speed))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + speed))][Math.ceil(xpos)])) {
+                ypos += speed;
                 if (ypos >= height - 4) {
                     ypos = height - 4;
                 }
@@ -319,13 +376,12 @@
                         selectIndex = Math.floor((myGameArea.x - 70) / 80);
                     } else {
                         myGameArea.click = false;
-                        if (myGameArea.getc() == 'g') {
+                        if (myGameArea.getc() == defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]) {
                             if (placabli.includes(aitelm[selectIndex] ? (aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no') : 'no')) {
                                 myGameArea.setc(placable[placabli.indexOf(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no')][1]);
                                 myGameArea.add(aitelm[selectIndex][0], -1);
                             }
                         } else {
-                            //console.log(myGameArea.getc(), placabli.includes(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no'))
                             if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
                                 clickCount = 1;
                             } else {
@@ -337,7 +393,7 @@
                             var dq = dropitem[myGameArea.getc()][a[0]] ? a[0] : 'def';
                             if (clickCount == mq) {
                                 myGameArea.add(dropitem[myGameArea.getc()][dq][0], Math.floor(Math.random() * (dropitem[myGameArea.getc()][dq][1][1] - dropitem[myGameArea.getc()][dq][1][0] + 1)) + dropitem[myGameArea.getc()][dq][1][0]);
-                                myGameArea.setc('g');
+                                myGameArea.setc(defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]);
                             }
                             lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
                             lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
@@ -513,7 +569,6 @@
                 canvasX, canvasY, 100, 100);
         }
     </script>
-    <script src="tileLoad.js"></script>
     <canvas id="canvas"></canvas>
 </body>
 </html>
