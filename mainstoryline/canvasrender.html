@@ -61,7 +61,10 @@
                     blocks[o][j] = biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr':'ds');
                 }
             }
-
+            while (blocks[ypos][xpos] != 'g') {
+                xpos = Math.floor(Math.random() * 1000);
+                ypos = Math.floor(Math.random() * 1000);
+            }
         }
         var biomes = [];
         function generateBiomes() {
@@ -377,9 +380,11 @@
                     } else {
                         myGameArea.click = false;
                         if (myGameArea.getc() == defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]) {
-                            if (placabli.includes(aitelm[selectIndex] ? (aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no') : 'no')) {
-                                myGameArea.setc(placable[placabli.indexOf(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no')][1]);
-                                myGameArea.add(aitelm[selectIndex][0], -1);
+                            if (!((Math.floor(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3) || Math.ceil(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3)) && (Math.floor(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3) || Math.ceil(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3)))) {
+                                if (placabli.includes(aitelm[selectIndex] ? (aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no') : 'no')) {
+                                    myGameArea.setc(placable[placabli.indexOf(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no')][1]);
+                                    myGameArea.add(aitelm[selectIndex][0], -1);
+                                }
                             }
                         } else {
                             if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
