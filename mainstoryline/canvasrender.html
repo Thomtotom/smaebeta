@@ -5,11 +5,10 @@
     <style>
         canvas {
             background-color: #f1f1f1;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
-            image-rendering: crisp-edges;
-            /*image-rendering: pixelated;*/
             height: 98vh;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
         }
 
         * {
@@ -19,134 +18,19 @@
     </style>
 </head>
 <body onload="startGame()">
-    <script>
-        var speed = 0.0625;
-        var placable = [['l','lp'],['fb','fb']]
-        var invIndex = -1;
-        var maxClicks = {
-            r: { def: 10, px: 4},
-            t4: { def: 10, x: 4 },
-            lp: { def: 4, x: 2 },
-            fb: { def: 4, x: 2 },
-        };
-        var dropitem = {
-            r: { def: ['s', [1, 2]] },
-            t4: { def: ['l', [4, 7]] },
-            lp: { def: ['l', [1, 1]] },
-            fb: { def: ['fb',[1, 1]] },
-        };
-        var defaultTile = {
-            forest: 'g',
-            mountain: 'sr',
-            desert: 'ds',
-        };
-        var recipes = [
-            [['p', 4], [['l', 1]]],
-            [['st',4],[['p', 2]]],
-            [['sw', 1], [['s', 5], ['st', 10]]],
-            [['px', 1], [['s', 5], ['st', 10]]],
-            [['x', 1], [['s', 5], ['st', 10]]],
-            [['bx', 1], [['s', 10], ['st', 10]]],
-            [['fb', 1], [['p', 4]]],
-        ];
-        var inventory = [], selectIndex = 0;
-        var walkable = ['g', 't0','fb','sr','ds'];
-        var blocks = [];
-        var screenNum = 0;
-        //spawn, map size
-        function loadTiles() {
-            generateBiomes();
-            for (var o = 0; o < height; o++) {
-                for (var j = 0; j < width; j++) {
-                    blocks[o][j] = biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr':'ds');
-                }
-            }
-            while (blocks[ypos][xpos] != 'g') {
-                xpos = Math.floor(Math.random() * 1000);
-                ypos = Math.floor(Math.random() * 1000);
-            }
-        }
-        var biomes = [];
-        function generateBiomes() {
-            var colors = ['#ffff99', 'grey'];
-            var cs = document.createElement("CANVAS");
-            cs.width = 1000;
-            cs.height = 1000;
-            var ctx = cs.getContext("2d");
-            var l = 100;
-            ctx.fillStyle = 'green';
-            ctx.fillRect(0, 0, 1000, 1000);
-            for (var k = 0; k < 12; k++) {
-                var dx = Math.random() * 1000; dy = Math.random() * 1000;
-                l = 200;
-                ctx.beginPath();
-                ctx.fillStyle = colors[k % colors.length];
-                ctx.moveTo(dx, dy);
-                for (var m = 0; m < 340; m++) {
-                    l += (Math.random() * 10) - 5;
-                    ctx.lineTo(dx + l * Math.cos(m * Math.PI / 180), dy + l * Math.sin(m * Math.PI / 180));
-                }
-                ctx.lineTo(dx + 200, dy);
-                ctx.fill();
-            }
-            var c = ctx.getImageData(0, 0, 1000, 1000).data;
-            for (var i = 0; i < c.length; i += 4) {
-                if (c[i] == 0 && c[i + 1] == 128 && c[i + 2] == 0) {
-                    biomes.push('forest');
-                } else if (c[i] == 255 && c[i + 1] == 255 && c[i + 2] == 153) {
-                    biomes.push('desert');
-                } else if (c[i] == 128 && c[i + 1] == 128 && c[i + 2] == 128) {
-                    biomes.push('mountain');
-                } else {
-                    biomes.push('forest');
-                }
-            }
-        }
-        var xpos = 500, ypos = 500, height = 1000, width = 1000;
-
-        function addDetail(xx, yy, src) {
-            blocks[yy][xx] = src;
-        }
-        function fillAll(src) {
-            for (var row = 0; row < height; row++) {
-                for (var tile = 0; tile < width; tile++) {
-                    blocks[width][tile] = src;
-                }
-            }
-        }
-        function fillRandom(k) {
-            var total = 0;
-            for (l in k) {
-                total += k[l][1];
-            }
-            for (var row = 0; row < height; row++) {
-                for (var tile = 0; tile < width; tile++) {
-                    var p = Math.random() * total, c = 0;
-                    for (m in k) {
-                        c += k[m][1];
-                        if (p < c) {
-                            blocks[row][tile] = k[m][0];
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        function randompatch(cx, cy, r, src) {
-            for (var dx = cx - r; dx < cx + r; dx++) {
-                for (var dy = cy - r; dy < cy + r; dy++) {
-                    if (((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r - 1) || ((((cy - dy) ** 2) + ((cx - dx) ** 2)) ** (1 / 2) < r + 1 && Math.random() > 0.5)) {
-                        blocks[dy][dx] = src;
-                    }
-                }
-            }
-        }
-
+    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [['e1', ''], ['e2', ''], ['e3', ''], ['e4', ''], ['e5', ''], ['e6', ''], ['e7', ''], ['e8', ''], ['e9', ''], ['e10', ''], ['e11', ''], ['e12', ''], ['e13', ''], ['e14', ''], ['e15', ''], ['e16', ''], ['e17', ''], ['e18', ''], ['e19', ''], ['e20', ''], ['e21', ''], ['e22', ''], ['e23', ''], ['e24', ''], ['e25', ''], ['e26', ''], ['e27', ''], ['e28', ''], ['e29', ''], ['e30', '']], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1;
         function startGame() {
-            myGameArea.start();
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
             }
+            recipes = data.recipes;
+            maxClicks = data.maxClicks;
+            defaultTile = data.defaultTile;
+            walkable = data.walkable;
+            dropitem = data.dropitem;
+            placable = data.placable;
+            blockimg = data.blockimg;
+            myGameArea.start();
             myGameArea.context.imageSmoothingEnabled = false;
         }
         var myGameArea = {
@@ -167,14 +51,20 @@
                     }
                 }
                 if (p == 0) {
-                    inventory.push([c, n]);
+                    for (var w = 0; w < inventory.length; w++) {
+                        if (inventory[w][1] === '') {
+                            inventory[w][1] = n;
+                            inventory[w][0] = c;
+                            break;
+                        }
+                    }
                 }
             },
             start: function () {
                 document.getElementById("canvas").width = 700;
                 document.getElementById("canvas").height = 700;
                 this.context = document.getElementById("canvas").getContext("2d");
-                imgp.src = 'player.png';
+                imgp.src = 'imgs/player.png';
                 imgp.onload = function () {
                     setInterval(updateGameArea, 20);
                 };
@@ -216,142 +106,6 @@
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             }
         }
-        function renderBlocks() {
-            var ctx = myGameArea.context;
-            for (var r = Math.floor(ypos) - 5; r < Math.floor(ypos) + 5; r++) {
-                for (var c = Math.floor(xpos) - 5; c < Math.floor(xpos) + 5; c++) {
-                    //very important, makes sure only visible tiles are rendered, saving huge amounts of time and lag.
-                    var imgs = new Image();
-                    imgs.src = 'tiles/tiles-1.png';
-                    var d = chooseBlock(blocks[r][c]);
-                    ctx.drawImage(imgs, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + 3) * 100, (r - ypos + 3) * 100, 100, 100);
-                }
-            }
-        }
-        function chooseBlock(e) {
-            var dx, dy;
-            switch (e) {
-                case 'g':
-                    dx = 0;
-                    dy = 0;
-                    break;
-                case 't0':
-                    dx = 1;
-                    dy = 0;
-                    break;
-                case 't2':
-                    dx = 2;
-                    dy = 0;
-                    break;
-                case 't3':
-                    dx = 3;
-                    dy = 0;
-                    break;
-                case 't1':
-                    dx = 4;
-                    dy = 0;
-                    break;
-                case 't4':
-                    dx = 0;
-                    dy = 1;
-                    break;
-                case 'r':
-                    dx = 1;
-                    dy = 1;
-                    break;
-                case 'sw':
-                    dx = 2;
-                    dy = 1;
-                    break;
-                case 'l':
-                    dx = 3;
-                    dy = 1;
-                    break;
-                case 's':
-                    dx = 4;
-                    dy = 1;
-                    break;
-                case 'p':
-                    dx = 0;
-                    dy = 2;
-                    break;
-                case 'st':
-                    dx = 1;
-                    dy = 2;
-                    break;
-                case 'px':
-                    dx = 2;
-                    dy = 2;
-                    break;
-                case 'x':
-                    dx = 3;
-                    dy = 2;
-                    break;
-                case 'bx':
-                    dx = 4;
-                    dy = 2;
-                    break;
-                case 'lp':
-                    dx = 0;
-                    dy = 3;
-                    break;
-                case 'fb':
-                    dx = 1;
-                    dy = 3;
-                    break;
-                case 'ds':
-                    dx = 2;
-                    dy = 3;
-                    break;
-                case 'sr':
-                    dx = 3;
-                    dy = 3;
-                    break;
-                /* decides what to render. Each tile has 1-4 letter shorthand. syntax:
-                case <shorthand>:
-                    dx = <xpos in sheet>;
-                    dy = <ypos in sheet>;
-                    break;
-                */
-            }
-            return [dx, dy];
-        }
-        function left() {
-            if (walkable.includes(blocks[(Math.floor(ypos))][Math.ceil(xpos + speed)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.ceil(xpos + speed)])) {
-                xpos += speed;
-                if (xpos >= width - 4) {
-                    xpos = width - 4;
-                }
-            }
-        }
-        function right() {
-            if (walkable.includes(blocks[(Math.floor(ypos))][Math.floor(xpos - speed)]) && walkable.includes(blocks[(Math.ceil(ypos))][Math.floor(xpos - speed)])) {
-                xpos -= speed;
-                if (xpos <= 3) {
-                    xpos = 3;
-                }
-            }
-        }
-        function up() {
-            if (walkable.includes(blocks[(Math.floor(ypos - speed))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.floor(ypos - speed))][Math.ceil(xpos)])) {
-                ypos -= speed;
-                if (ypos <= 3) {
-                    ypos = 3;
-                }
-            }
-        }
-        function down() {
-            if (walkable.includes(blocks[(Math.ceil(ypos + speed))][Math.floor(xpos)]) && walkable.includes(blocks[(Math.ceil(ypos + speed))][Math.ceil(xpos)])) {
-                ypos += speed;
-                if (ypos >= height - 4) {
-                    ypos = height - 4;
-                }
-            }
-        }
-        var lastClick = {
-            x: -1,
-            y: -1
-        }, clickCount = 1;
         function updateGameArea() {
             myGameArea.clear();
             if (screenNum == 0) {
@@ -362,218 +116,35 @@
                     loadTiles();
                     screenNum = 1;
                 }
-            } else if (screenNum == 1) {
-                let hasMoved = false;
-                var aitelm = [];
-                for (var b = 0; b < inventory.length; b++) {
-                    if (inventory[b][1] > 0) {
-                        aitelm.push(inventory[b]);
-                    }
-                }
-                var placabli = [];
-                for (var e = 0; e < placable.length; e++) {
-                    placabli.push(placable[e][0]);
-                }
-                if (myGameArea.click && myGameArea.x < 700 && myGameArea.x > 0 && myGameArea.y < 700 && myGameArea.y > 0) {
-                    if (myGameArea.x > 70 && myGameArea.x < 630 && myGameArea.y > 600 && myGameArea.y < 680) {
-                        selectIndex = Math.floor((myGameArea.x - 70) / 80);
-                    } else {
-                        myGameArea.click = false;
-                        if (myGameArea.getc() == defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]) {
-                            if (!((Math.floor(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3) || Math.ceil(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3)) && (Math.floor(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3) || Math.ceil(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3)))) {
-                                if (placabli.includes(aitelm[selectIndex] ? (aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no') : 'no')) {
-                                    myGameArea.setc(placable[placabli.indexOf(aitelm[selectIndex][0] ? aitelm[selectIndex][0] : 'no')][1]);
-                                    myGameArea.add(aitelm[selectIndex][0], -1);
-                                }
-                            }
-                        } else {
-                            if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
-                                clickCount = 1;
-                            } else {
-                                clickCount += 1;
-                            }
-                            myGameArea.click = false;
-                            var a = aitelm[selectIndex] ? aitelm[selectIndex] : 'def';
-                            var mq = maxClicks[myGameArea.getc()][a[0]] ? maxClicks[myGameArea.getc()][a[0]] : maxClicks[myGameArea.getc()]['def'];
-                            var dq = dropitem[myGameArea.getc()][a[0]] ? a[0] : 'def';
-                            if (clickCount == mq) {
-                                myGameArea.add(dropitem[myGameArea.getc()][dq][0], Math.floor(Math.random() * (dropitem[myGameArea.getc()][dq][1][1] - dropitem[myGameArea.getc()][dq][1][0] + 1)) + dropitem[myGameArea.getc()][dq][1][0]);
-                                myGameArea.setc(defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]);
-                            }
-                            lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
-                            lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
-                        }
-                    }
-                }
-                if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[97] || myGameArea.keys[65])) {
-                    right();
-                    currentDirection = FACING_LEFT;
-
-                    hasMoved = true;
-                } else if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[100] || myGameArea.keys[68])) {
-                    left();
-                    hasMoved = true;
-                    currentDirection = FACING_RIGHT;
-                }
-                if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[119] || myGameArea.keys[87])) {
-                    up();
-                    hasMoved = true;
-                } else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[115] || myGameArea.keys[83])) {
-                    down();
-                    hasMoved = true;
-                }
-                if (hasMoved) {
-                    frameCount++;
-                    if (frameCount >= FRAME_LIMIT) {
-                        frameCount = 0;
-                        currentLoopIndex++;
-                        if (currentLoopIndex >= CYCLE_LOOP.length) {
-                            currentLoopIndex = 0;
-                        }
-                    }
-                }
-
-                if (!hasMoved) {
-                    currentLoopIndex = 0;
-                }
+            } else if (screenNum == 1) {              
+                dealWithClicks();
+                clearBlanks();
                 renderBlocks();
-
-                drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, 300, 300);
-                for (var w = 0; w < 7; w++) {
-                    myGameArea.context.fillStyle = (w == selectIndex ? 'gold' : 'grey');
-                    myGameArea.context.fillRect(70 + (80 * w), 600, 80, 80);
-                    /*myGameArea.context.fillStyle = 'black';
-                    myGameArea.context.moveTo(52 + (56 * y), 52);
-                    myGameArea.context.lineTo(104 + (56 * y), 52);
-                    myGameArea.context.lineTo(104 + (56 * y), 104);
-                    myGameArea.context.lineTo(52 + (56 * y), 104);
-                    myGameArea.context.lineTo(52 + (56 * y), 52);
-                    myGameArea.context.stroke();*/
-                    if (aitelm[w]) {
-                        var gx = chooseBlock(aitelm[w][0])[0] * 32, gy = chooseBlock(aitelm[w][0])[1] * 32;
-                        var img = new Image();
-                        img.src = 'tiles/tiles-1.png';
-                        myGameArea.context.drawImage(img, gx, gy, 32, 32, 75 + (80 * w), 605, 70, 70);
-                        myGameArea.context.font = '20px Arial';
-                        myGameArea.context.fillStyle = 'white';
-                        myGameArea.context.fillText(aitelm[w][1], 105 + w * 80, 675);
-                    }
-                }
+                renderDrops();
+                renderPlayer(move());
+                renderHotbar();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
                     myGameArea.keys[69] = false;
                 }
             } else if (screenNum == 2) {
-                if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101]))) {
-                    screenNum = 1;
-                    myGameArea.keys[101] = false;
-                    myGameArea.keys[69] = false;
-                    invIndex = -1;
-                }
                 myGameArea.context.fillStyle = '#000066';
                 myGameArea.context.fillRect(0, 0, 700, 700);
-                var aitem = [];
-                for (var x = 0; x < inventory.length; x++) {
-                    if (inventory[x][1] > 0) {
-                        aitem.push(inventory[x]);
-                    }
-                }
-                for (var y = 0; y < aitem.length; y++) {
-                    var gx = chooseBlock(aitem[y][0])[0] * 32, gy = chooseBlock(aitem[y][0])[1] * 32;
-                    var img = new Image();
-                    img.src = 'tiles/tiles-1.png';
-                    myGameArea.context.fillStyle = (y != invIndex ? (y <= 6?'gold':'grey') : 'orange');
-                    myGameArea.context.fillRect(50 + (56 * y), 50, 56, 56);
-                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * y), 53, 50, 50);
-                    myGameArea.context.font = '15px Arial';
-                    myGameArea.context.fillStyle = 'white';
-                    myGameArea.context.fillText(aitem[y][1], 80 + y * 56, 100);
-                }
-                var arec = [], arecc = [];
-                for (var x = 0; x < recipes.length; x++) {
-                    var o = 0;
-                    for (var m = 0; m < recipes[x][1].length; m++) {
-                        var t = [];
-                        for (var p = 0; p < inventory.length; p++) {
-                            t.push(inventory[p][0]);
-                        }
-                        if (t.indexOf(recipes[x][1][m][0]) == -1 || inventory[t.indexOf(recipes[x][1][m][0])][1] < recipes[x][1][m][1]) {
-                            o = 1;
-                        }
-                    }
-                    if (o == 0) {
-                        arec.push(recipes[x][0][0]);
-                        arecc.push(recipes[x]);
-                    }
-                }
-                for (var q in arec) {
-                    var gx = chooseBlock(arecc[q][0][0])[0] * 32, gy = chooseBlock(arecc[q][0][0])[1] * 32;
-                    var img = new Image();
-                    img.src = 'tiles/tiles-1.png';
-                    myGameArea.context.fillStyle = 'grey';
-                    myGameArea.context.fillRect(50 + (56 * (q % 10)), 250 + 56 * Math.floor(q/10), 56, 56);
-                    myGameArea.context.font = '15px Arial';
-                    myGameArea.context.fillStyle = 'white';
-                    myGameArea.context.drawImage(img, gx, gy, 32, 32, 53 + (56 * (q % 10)), 253 + 56 * Math.floor(q / 10), 50, 50);
-                    myGameArea.context.fillText(arecc[q][0][1], 80 + (q % 10) * 56, 300 + 56 * Math.floor(q / 10));
-                }
-                if (myGameArea.click && myGameArea.x > 50 && myGameArea.x < 610 && myGameArea.y > 50 && myGameArea.y < 208) {
-                    if (aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)]) {
-                        if (invIndex == -1 || !aitem[invIndex]) {
-                            invIndex = Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56);
-                        } else {
-                            var f = [];
-                            for (var p = 0; p < inventory.length; p++) {
-                                f.push(inventory[p][0]);
-                            }
-                            var h = inventory[f.indexOf(aitem[invIndex][0])];
-                            inventory[f.indexOf(aitem[invIndex][0])] = inventory[f.indexOf(aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])];
-                            inventory[f.indexOf(aitem[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])] = h;
-                            myGameArea.click = false;
-                        }
-                    } else {
-                        invIndex = -1;
-                    }
-                } else if (myGameArea.click) {
-                    invIndex = -1;
-                }
-                if (myGameArea.click && myGameArea.x < 610 && myGameArea.y > 250 && myGameArea.x > 50) {
-                    myGameArea.click = false;
-                    if (arec[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)]) {
-                        var t = [];
-                        for (var p = 0; p < inventory.length; p++) {
-                            t.push(inventory[p][0]);
-                        }
-                        for (r in arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1]) {
-                            inventory[t.indexOf(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0])][1] -= arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][1];
-                            arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r];
-                        }
-                        myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][0], arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][1]);
-                    }
-                }
+                closeInventory();
+                renderItems();
+                clearBlanks();
+                dealWithSwaps();
+                dealWithCrafts(renderRecipes());
             }
         }
-        const CYCLE_LOOP = [0, 1, 2, 3,4,5];
-        const FACING_LEFT = 0;
-        const FACING_RIGHT = 1;
-        const FRAME_LIMIT = 5;
-
-
-        let currentDirection = FACING_RIGHT;
-
-        let currentLoopIndex = 0;
-        let frameCount = 0;
-        let positionX = 0;
-        let positionY = 0;
-
-        let imgp = new Image();
-        function drawFrame(frameX, frameY, canvasX, canvasY) {
-            myGameArea.context.drawImage(imgp,
-                frameX * 32, frameY * 32, 32, 32,
-                canvasX, canvasY, 100, 100);
-        }
     </script>
+    <script src="src/data.js"></script>
+    <script src="src/motion.js"></script>
+    <script src="src/generate.js"></script>
+    <script src="src/render.js"></script>
+    <script src="src/inventory.js"></script>
+
     <canvas id="canvas"></canvas>
 </body>
 </html>
