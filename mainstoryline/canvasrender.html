@@ -123,6 +123,7 @@
                 renderDrops();
                 renderPlayer(move());
                 renderHotbar();
+                slotSwitch();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;

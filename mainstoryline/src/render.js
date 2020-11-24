@@ -117,3 +117,26 @@ function closeInventory() {
         invIndex = -1;
     }
 }
+function slotSwitch() {
+    if (myGameArea.keys && myGameArea.keys[49]) {
+        selectIndex = 0;
+    }
+    if (myGameArea.keys && myGameArea.keys[50]) {
+        selectIndex = 1;
+    }
+    if (myGameArea.keys && myGameArea.keys[51]) {
+        selectIndex = 2;
+    }
+    if (myGameArea.keys && myGameArea.keys[52]) {
+        selectIndex = 3;
+    }
+    if (myGameArea.keys && myGameArea.keys[53]) {
+        selectIndex = 4;
+    }
+    if (myGameArea.keys && myGameArea.keys[54]) {
+        selectIndex = 5;
+    }
+    if (myGameArea.keys && myGameArea.keys[55]) {
+        selectIndex = 6;
+    }
+}

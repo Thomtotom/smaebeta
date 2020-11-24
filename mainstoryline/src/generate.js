@@ -2,7 +2,19 @@
     generateBiomes();
     for (var o = 0; o < height; o++) {
         for (var j = 0; j < width; j++) {
-            blocks[o][j] = (o < 3 || o > 996 || j < 3 || j > 996) ? '' : (biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? (Math.random() < 0.95 ? 'sr' : (Math.random() < 0.5 ? 'co' : 'io')) : 'ds'));
+            blocks[o][j] = (o < 3 || o > 996 || j < 3 || j > 996) ? '' : (biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr' : 'ds'));
+        }
+    }
+    for (p in data.spawnpatch) {
+        for (var s = 0; s < data.spawnpatch[p][0]; s++) {
+            var loop = Math.floor(Math.random() * (data.spawnpatch[p][1][1] - data.spawnpatch[p][1][0])) + data.spawnpatch[p][1][0], cx = Math.floor(Math.random() * 994) + 3, cy = Math.floor(Math.random() * 994) + 3;
+            while (biomes[cx + width * cy] != 'mountain') {
+                cx = Math.floor(Math.random() * 994) + 3;
+                cy = Math.floor(Math.random() * 994) + 3;
+            } 
+            for (var n = 0; n < loop; n++) {
+                blocks[cy + (n == 0 ? 1 : (n == 1 ? 2 : (n >= 2 && n <= 9 ? Math.floor((n - 2) / 4) : 1)))][cx + (n == 0 ? 1 : (n == 1 ? 2 : (n >= 2 && n <= 9 ? (n - 2) % 4 : 1)))] = String(p);
+            }
         }
     }
     while (blocks[ypos][xpos] != 'g') {
