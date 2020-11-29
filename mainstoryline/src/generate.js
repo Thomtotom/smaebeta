@@ -2,7 +2,7 @@
     generateBiomes();
     for (var o = 0; o < height; o++) {
         for (var j = 0; j < width; j++) {
-            blocks[o][j] = (o < 3 || o > 996 || j < 3 || j > 996) ? '' : (biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr' : 'ds'));
+            blocks[o][j] = (o < 3 || o > 996 || j < 3 || j > 996) ? '' : (biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr' : (Math.random() < 0.02 ? 'db' : 'ds')));
         }
     }
     for (p in data.spawnpatch) {

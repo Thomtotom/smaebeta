@@ -80,11 +80,15 @@
                 window.addEventListener('mousedown', function (e) {
                     myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
                     myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
                     myGameArea.click = true;
                 })
                 window.addEventListener('mousemove', function (e) {
                     myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
                     myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
                 })
                 window.addEventListener('mouseup', function (e) {
                     myGameArea.x = false;
@@ -124,6 +128,7 @@
                 renderPlayer(move());
                 renderHotbar();
                 slotSwitch();
+                renderCursor();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;

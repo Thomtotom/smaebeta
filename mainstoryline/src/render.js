@@ -2,6 +2,8 @@
 ime.src = 'imgs/system.png';
 var imt = new Image();
 imt.src = 'imgs/tiles-1.png';
+var imm = new Image();
+imm.src = 'imgs/mobs.png';
 function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
         var dq = chooseBlock(dropblocs[b].item);
@@ -25,9 +27,9 @@ function renderBlocks() {
 }
 function chooseBlock(e) {
     if (!blockimg[e]) {
-        return [200, 200];
+        return [200, 200,false];
     }
-    return [blockimg[e][0], blockimg[e][1]];
+    return [blockimg[e][0], blockimg[e][1],true];
 }
 function renderPlayer(moved) {
     if (moved) {
@@ -80,7 +82,7 @@ function renderRecipes() {
                 o = 1;
             }
         }
-        if (o == 0) {
+        if (o == 0 && isNearby(recipes[x][2])) {
             arec.push(recipes[x][0][0]);
             arecc.push(recipes[x]);
         }
@@ -104,6 +106,8 @@ function closeInventory() {
         myGameArea.keys[69] = false;
         invIndex = -1;
     }
+    document.getElementById("canvas").style.cursor = 'default';
+
 }
 function slotSwitch() {
     if (myGameArea.keys && myGameArea.keys[49]) {
@@ -127,4 +131,38 @@ function slotSwitch() {
     if (myGameArea.keys && myGameArea.keys[55]) {
         selectIndex = 6;
     }
+}
+function renderCursor() {
+    if (chooseBlock(inventory[selectIndex][0])[2]) {
+        document.getElementById("canvas").style.cursor = 'none';
+        myGameArea.context.drawImage(imt, 32 * chooseBlock(inventory[selectIndex][0])[0], 32 * chooseBlock(inventory[selectIndex][0])[1], 32, 32, myGameArea.ax - 32, myGameArea.ay - 32, 64, 64);
+    } else {
+        document.getElementById("canvas").style.cursor = 'default';
+    }
+}
+function mob(name) {
+    this.x = 0; this.y = 0;
+    while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
+        this.x = Math.floor(Math.random() * 994) + 3;
+        this.y = Math.floor(Math.random() * 994) + 3;
+    }
+    this.h = data.mobs[name].health;
+    this.t = data.mobs[name].type;
+    this.ng = 0;
+    this.d = data.mobs[name].drop;
+    this.render = function () {
+        if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
+            myGameArea.context.drawImage(imm, data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][0], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][1], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][2], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][3], (this.x - xpos + 3) * 100 - 50,(this.y - ypos + 3) * 100 - 50,100,100)
+        }
+    };
+    this.die = function () {
+        for (p in this.d) {
+            dropblocs.push({
+                item: this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][0],
+                num: Math.floor(Math.random() * (this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][1] - this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][0] + 1)) + this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][0],
+                xp: this.x,
+                yp: this.y,
+            });
+        }
+    };
 }

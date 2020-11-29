@@ -1,4 +1,18 @@
-﻿function dealWithClicks() {
+﻿function isNearby(x) {
+    if (x == 'none') {
+        return true;
+    } else {
+        for (var qx = Math.floor(xpos) - 5; qx < Math.floor(xpos) + 5; qx++) {
+            for (var qy = Math.floor(ypos) - 5; qy < Math.floor(ypos) + 5; qy++) {
+                if ((((xpos - qx) ** 2) + ((ypos - qy) ** 2)) ** (1 / 2) <= 5 && blocks[qy][qx] == x) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+function dealWithClicks() {
     var placabli = [];
     for (var e = 0; e < placable.length; e++) {
         placabli.push(placable[e][0]);
