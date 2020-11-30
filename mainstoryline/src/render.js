@@ -140,8 +140,8 @@ function renderCursor() {
         document.getElementById("canvas").style.cursor = 'default';
     }
 }
-function mob(name) {
-    this.x = 0; this.y = 0;
+function mob(name,index) {
+    this.x = Math.floor(Math.random() * 994) + 3; this.y = Math.floor(Math.random() * 994) + 3;
     while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
         this.x = Math.floor(Math.random() * 994) + 3;
         this.y = Math.floor(Math.random() * 994) + 3;
@@ -151,10 +151,49 @@ function mob(name) {
     this.ng = 0;
     this.d = data.mobs[name].drop;
     this.render = function () {
+        this.move();
         if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
-            myGameArea.context.drawImage(imm, data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][0], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][1], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][2], data.mobs[name].get[this.ng < Math.PI / 2 && this.ng > Math.PI * 3 / 2 ? 'r' : 'l'][3], (this.x - xpos + 3) * 100 - 50,(this.y - ypos + 3) * 100 - 50,100,100)
+            if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
+                myGameArea.context.drawImage(imm, data.mobs[name].get['r'][0], data.mobs[name].get['r'][1], data.mobs[name].get['r'][2], data.mobs[name].get['r'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+            } else {
+                myGameArea.context.drawImage(imm, data.mobs[name].get['l'][0], data.mobs[name].get['l'][1], data.mobs[name].get['l'][2], data.mobs[name].get['l'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+            }
         }
     };
+    this.ac = 0;
+    this.dy = function (e) {
+        if (e > 0) {
+            if (walkable.includes(blocks[(Math.floor(this.y - e))][Math.floor(this.x)]) && walkable.includes(blocks[(Math.floor(this.y - e))][Math.ceil(this.x)])) {
+                this.y -= e;
+            }
+        } else {
+            if (walkable.includes(blocks[(Math.ceil(this.y + e))][Math.floor(this.x)]) && walkable.includes(blocks[(Math.ceil(this.y + e))][Math.ceil(this.x)])) {
+                this.y -= e;
+            }
+        }
+    }
+    this.dx = function (e) {
+        if (e > 0) {
+            if (walkable.includes(blocks[(Math.floor(this.y))][Math.ceil(this.x + e)]) && walkable.includes(blocks[(Math.ceil(this.y))][Math.ceil(this.x + e)])) {
+                this.x += e;
+            }
+        } else {
+            if (walkable.includes(blocks[(Math.floor(this.y))][Math.floor(this.x - e)]) && walkable.includes(blocks[(Math.ceil(this.y))][Math.floor(this.x - e)])) {
+                this.x += e;
+            }
+        }
+    }
+    this.move = function () {
+        if (this.t == 'passive') {
+            this.ac++;
+            if (this.ac == 50) {
+                this.ac = 0;
+                this.ng = Math.random() * Math.PI * 2;
+            }
+        }
+        this.dx(Math.cos(this.ng) / 20);
+        this.dy(Math.sin(this.ng) / 20); 
+    }
     this.die = function () {
         for (p in this.d) {
             dropblocs.push({
@@ -165,4 +204,24 @@ function mob(name) {
             });
         }
     };
+    this.destroy = function () {
+        this.ac = undefined;
+        this.x = undefined;
+        this.y = undefined;
+        this.h = undefined;
+        this.t = undefined;
+        this.d = undefined;
+        this.ng = undefined;
+    }
+}
+var mobs = [];
+function genMobs() {
+    for (var c = 0; c < 2000; c++) {
+        mobs.push(new mob('cow'));
+    }
+}
+function renMobs() {
+    for (var t = 0; t < mobs.length; t++) {
+        mobs[t].render();
+    }
 }
