@@ -7,10 +7,12 @@ imm.src = 'imgs/mobs.png';
 function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
         var dq = chooseBlock(dropblocs[b].item);
-        myGameArea.context.drawImage(imt, dq[0] * 32, dq[1] * 32, 32, 32, (dropblocs[b].xp - xpos + 3.3) * 100, (dropblocs[b].yp - ypos + 3.3) * 100, 40, 40);
-        if ((Math.floor(xpos) == dropblocs[b].xp || Math.ceil(xpos) == dropblocs[b].xp) && (Math.floor(ypos) == dropblocs[b].yp || Math.ceil(ypos) == dropblocs[b].yp)) {
-            myGameArea.add(dropblocs[b].item, dropblocs[b].num);
-            dropblocs.splice(b, 1);
+        if (dropblocs[b].num > 0) {
+            myGameArea.context.drawImage(imt, dq[0] * 32, dq[1] * 32, 32, 32, (dropblocs[b].xp - xpos + 3.3) * 100, (dropblocs[b].yp - ypos + 3.3) * 100, 40, 40);
+            if ((((xpos - dropblocs[b].xp) ** 2) + ((ypos - dropblocs[b].yp) ** 2)) ** (1 / 2) <= 1) {
+                myGameArea.add(dropblocs[b].item, dropblocs[b].num);
+                dropblocs.splice(b, 1);
+            }
         }
     }
 }
@@ -140,26 +142,39 @@ function renderCursor() {
         document.getElementById("canvas").style.cursor = 'default';
     }
 }
-function mob(name,index) {
+function mob(name) {
     this.x = Math.floor(Math.random() * 994) + 3; this.y = Math.floor(Math.random() * 994) + 3;
     while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
         this.x = Math.floor(Math.random() * 994) + 3;
         this.y = Math.floor(Math.random() * 994) + 3;
     }
+    this.dmgc = 0;
+    this.ch = true;
     this.h = data.mobs[name].health;
     this.t = data.mobs[name].type;
     this.ng = 0;
     this.d = data.mobs[name].drop;
     this.render = function () {
-        this.move();
-        if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
-            if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                myGameArea.context.drawImage(imm, data.mobs[name].get['r'][0], data.mobs[name].get['r'][1], data.mobs[name].get['r'][2], data.mobs[name].get['r'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
-            } else {
-                myGameArea.context.drawImage(imm, data.mobs[name].get['l'][0], data.mobs[name].get['l'][1], data.mobs[name].get['l'][2], data.mobs[name].get['l'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+        if (this.ch) {
+            this.move();
+            if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
+                if (this.dmgc > 0) {
+                    this.dmgc--;
+                    if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
+                        myGameArea.context.drawImage(imm, data.mobs[name].get['dr'][0], data.mobs[name].get['dr'][1], data.mobs[name].get['dr'][2], data.mobs[name].get['dr'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                    } else {
+                        myGameArea.context.drawImage(imm, data.mobs[name].get['dl'][0], data.mobs[name].get['dl'][1], data.mobs[name].get['dl'][2], data.mobs[name].get['dl'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                    }
+                } else {
+                    if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
+                        myGameArea.context.drawImage(imm, data.mobs[name].get['r'][0], data.mobs[name].get['r'][1], data.mobs[name].get['r'][2], data.mobs[name].get['r'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                    } else {
+                        myGameArea.context.drawImage(imm, data.mobs[name].get['l'][0], data.mobs[name].get['l'][1], data.mobs[name].get['l'][2], data.mobs[name].get['l'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                    }
+                }
             }
         }
-    };
+    }; 
     this.ac = 0;
     this.dy = function (e) {
         if (e > 0) {
@@ -197,14 +212,16 @@ function mob(name,index) {
     this.die = function () {
         for (p in this.d) {
             dropblocs.push({
-                item: this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][0],
-                num: Math.floor(Math.random() * (this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][1] - this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][0] + 1)) + this.d[this.d[inventory[selectIndex]] ? inventory[selectIndex] : 'def'][p][1][0],
+                item: this.d[p][0],
+                num: Math.floor(Math.random() * (this.d[p][1][1] - this.d[p][1][0] + 1)) + this.d[p][1][0],
                 xp: this.x,
                 yp: this.y,
             });
         }
+        this.destroy();
     };
     this.destroy = function () {
+        this.ch = false;
         this.ac = undefined;
         this.x = undefined;
         this.y = undefined;

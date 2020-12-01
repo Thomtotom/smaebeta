@@ -27,35 +27,50 @@ function dealWithClicks() {
                 sx = myGameArea.x;
                 sy = myGameArea.y;
             }
-            myGameArea.click = false;
-            if (myGameArea.getc() == defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]) {
-                if (!((Math.floor(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3) || Math.ceil(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3)) && (Math.floor(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3) || Math.ceil(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3)))) {
-                    if (placabli.includes(inventory[selectIndex] ? (inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no') : 'no')) {
-                        myGameArea.setc(placable[placabli.indexOf(inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no')][1]);
-                        myGameArea.add(inventory[selectIndex][0], -1);
+            var k = true;
+            for (var o = 0; o < mobs.length; o++) {
+                if (xpos + myGameArea.x / 100 - 3 < mobs[o].x + 1 && xpos + myGameArea.x / 100 - 3 > mobs[o].x && ypos + myGameArea.y / 100 - 3 < mobs[o].y + 1 && ypos + myGameArea.y / 100 - 3 > mobs[o].y) {
+                    k = false;
+                    if (mobs[o].dmgc == 0) {
+                        mobs[o].dmgc = 25;
+                        mobs[o].h -= (data.dmg[inventory[selectIndex][0]] ?? data.dmg['def']);
+                        if (mobs[o].h <= 0) {
+                            mobs[o].die();
+                        }
                     }
                 }
-            } else {
-                if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
-                    clickCount = 1;
+            }
+            myGameArea.click = false;
+            if (k) {
+                if (myGameArea.getc() == defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]) {
+                    if (!((Math.floor(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3) || Math.ceil(ypos) == Math.floor(ypos + myGameArea.y / 100 - 3)) && (Math.floor(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3) || Math.ceil(xpos) == Math.floor(xpos + myGameArea.x / 100 - 3)))) {
+                        if (placabli.includes(inventory[selectIndex] ? (inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no') : 'no')) {
+                            myGameArea.setc(placable[placabli.indexOf(inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no')][1]);
+                            myGameArea.add(inventory[selectIndex][0], -1);
+                        }
+                    }
                 } else {
-                    clickCount += 1;
+                    if (lastClick.x != Math.floor(xpos + myGameArea.x / 100 - 3) || lastClick.y != Math.floor(ypos + myGameArea.y / 100 - 3)) {
+                        clickCount = 1;
+                    } else {
+                        clickCount += 1;
+                    }
+                    myGameArea.click = false;
+                    var a = inventory[selectIndex] ? inventory[selectIndex] : 'def';
+                    var mq = maxClicks[myGameArea.getc()][a[0]] ? maxClicks[myGameArea.getc()][a[0]] : maxClicks[myGameArea.getc()]['def'];
+                    var dq = dropitem[myGameArea.getc()][a[0]] ? a[0] : 'def';
+                    if (clickCount == mq) {
+                        dropblocs.push({
+                            item: dropitem[myGameArea.getc()][dq][0],
+                            num: Math.floor(Math.random() * (dropitem[myGameArea.getc()][dq][1][1] - dropitem[myGameArea.getc()][dq][1][0] + 1)) + dropitem[myGameArea.getc()][dq][1][0],
+                            xp: Math.floor(xpos + myGameArea.x / 100 - 3),
+                            yp: Math.floor(ypos + myGameArea.y / 100 - 3)
+                        });
+                        myGameArea.setc(defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]);
+                    }
+                    lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
+                    lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
                 }
-                myGameArea.click = false;
-                var a = inventory[selectIndex] ? inventory[selectIndex] : 'def';
-                var mq = maxClicks[myGameArea.getc()][a[0]] ? maxClicks[myGameArea.getc()][a[0]] : maxClicks[myGameArea.getc()]['def'];
-                var dq = dropitem[myGameArea.getc()][a[0]] ? a[0] : 'def';
-                if (clickCount == mq) {
-                    dropblocs.push({
-                        item: dropitem[myGameArea.getc()][dq][0],
-                        num: Math.floor(Math.random() * (dropitem[myGameArea.getc()][dq][1][1] - dropitem[myGameArea.getc()][dq][1][0] + 1)) + dropitem[myGameArea.getc()][dq][1][0],
-                        xp: Math.floor(xpos + myGameArea.x / 100 - 3),
-                        yp: Math.floor(ypos + myGameArea.y / 100 - 3)
-                    });
-                    myGameArea.setc(defaultTile[biomes[Math.floor(ypos + myGameArea.y / 100 - 3) * width + Math.floor(xpos + myGameArea.x / 100 - 3)]]);
-                }
-                lastClick.x = Math.floor(xpos + myGameArea.x / 100 - 3);
-                lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
             }
         }
     }
