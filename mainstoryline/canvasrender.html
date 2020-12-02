@@ -18,7 +18,9 @@
     </style>
 </head>
 <body onload="startGame()">
-    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [['e1', ''], ['e2', ''], ['e3', ''], ['e4', ''], ['e5', ''], ['e6', ''], ['e7', ''], ['e8', ''], ['e9', ''], ['e10', ''], ['e11', ''], ['e12', ''], ['e13', ''], ['e14', ''], ['e15', ''], ['e16', ''], ['e17', ''], ['e18', ''], ['e19', ''], ['e20', ''], ['e21', ''], ['e22', ''], ['e23', ''], ['e24', ''], ['e25', ''], ['e26', ''], ['e27', ''], ['e28', ''], ['e29', ''], ['e30', '']], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1;
+    <script>
+        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [['e1', ''], ['e2', ''], ['e3', ''], ['e4', ''], ['e5', ''], ['e6', ''], ['e7', ''], ['e8', ''], ['e9', ''], ['e10', ''], ['e11', ''], ['e12', ''], ['e13', ''], ['e14', ''], ['e15', ''], ['e16', ''], ['e17', ''], ['e18', ''], ['e19', ''], ['e20', ''], ['e21', ''], ['e22', ''], ['e23', ''], ['e24', ''], ['e25', ''], ['e26', ''], ['e27', ''], ['e28', ''], ['e29', ''], ['e30', '']], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image();
+        bImage.src = '../frontpageandmainfiles/index wp.png';
         function startGame() {
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
@@ -78,11 +80,15 @@
                 window.addEventListener('mousedown', function (e) {
                     myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
                     myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
                     myGameArea.click = true;
                 })
                 window.addEventListener('mousemove', function (e) {
                     myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
                     myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
+                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
                 })
                 window.addEventListener('mouseup', function (e) {
                     myGameArea.x = false;
@@ -108,9 +114,7 @@
         }
         function updateGameArea() {
             myGameArea.clear();
-            if (screenNum == 0) {
-                var bImage = new Image();
-                bImage.src = '../frontpageandmainfiles/index wp.png'
+            if (screenNum == 0) {                
                 myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
                 if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
                     loadTiles();
@@ -122,8 +126,10 @@
                 renderBlocks();
                 renderDrops();
                 renderPlayer(move());
+                renMobs();
                 renderHotbar();
                 slotSwitch();
+                renderCursor();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
@@ -145,7 +151,6 @@
     <script src="src/generate.js"></script>
     <script src="src/render.js"></script>
     <script src="src/inventory.js"></script>
-
     <canvas id="canvas"></canvas>
 </body>
 </html>
