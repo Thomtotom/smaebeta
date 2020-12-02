@@ -19,6 +19,7 @@ function move() {
             xpos += speed;
             if (xpos >= width - 4) {
                 xpos = width - 4;
+            
             }
         }
         currentDirection = 1;
