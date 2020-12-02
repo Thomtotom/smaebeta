@@ -3,7 +3,7 @@ ime.src = 'imgs/system.png';
 var imt = new Image();
 imt.src = 'imgs/tiles-1.png';
 var imm = new Image();
-imm.src = 'imgs/mobs.png';
+imm.src = 'imgs/mobnew.png';
 function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
         var dq = chooseBlock(dropblocs[b].item);
@@ -154,22 +154,33 @@ function mob(name) {
     this.t = data.mobs[name].type;
     this.ng = 0;
     this.d = data.mobs[name].drop;
+    this.fc = 0;
+    this.fi = 0;
+    this.l = data.mobs[name].cycleLoop;
     this.render = function () {
         if (this.ch) {
             this.move();
             if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
+                this.fc++;
+                if (this.fc == data.mobs[name].framerate) {
+                    this.fc = 0;
+                    this.fi++;
+                    if (this.fi == this.l.length - 1) {
+                        this.fi = 0;
+                    }
+                }
                 if (this.dmgc > 0) {
                     this.dmgc--;
                     if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, data.mobs[name].get['dr'][0], data.mobs[name].get['dr'][1], data.mobs[name].get['dr'][2], data.mobs[name].get['dr'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dr'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
                     } else {
-                        myGameArea.context.drawImage(imm, data.mobs[name].get['dl'][0], data.mobs[name].get['dl'][1], data.mobs[name].get['dl'][2], data.mobs[name].get['dl'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dl'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
                     }
                 } else {
                     if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, data.mobs[name].get['r'][0], data.mobs[name].get['r'][1], data.mobs[name].get['r'][2], data.mobs[name].get['r'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['r'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
                     } else {
-                        myGameArea.context.drawImage(imm, data.mobs[name].get['l'][0], data.mobs[name].get['l'][1], data.mobs[name].get['l'][2], data.mobs[name].get['l'][3], (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['l'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
                     }
                 }
             }
@@ -206,9 +217,10 @@ function mob(name) {
                 this.ng = Math.random() * Math.PI * 2;
             }
         }
-        this.dx(Math.cos(this.ng) / 20);
-        this.dy(Math.sin(this.ng) / 20); 
-    }
+        this.dx(Math.cos(this.ng) * this.s);
+        this.dy(Math.sin(this.ng) * this.s);
+    };
+    this.s = data.mobs[name].speed;
     this.die = function () {
         for (p in this.d) {
             dropblocs.push({
@@ -234,7 +246,7 @@ function mob(name) {
 var mobs = [];
 function genMobs() {
     for (var c = 0; c < 2000; c++) {
-        mobs.push(new mob('cow'));
+        mobs.push(new mob('blob'));
     }
 }
 function renMobs() {
