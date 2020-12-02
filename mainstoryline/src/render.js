@@ -109,7 +109,6 @@ function closeInventory() {
         invIndex = -1;
     }
     document.getElementById("canvas").style.cursor = 'default';
-
 }
 function slotSwitch() {
     if (myGameArea.keys && myGameArea.keys[49]) {
@@ -253,4 +252,21 @@ function renMobs() {
     for (var t = 0; t < mobs.length; t++) {
         mobs[t].render();
     }
+}
+function renderMap() {
+    for (var x = 0; x < map.length; x++) {
+        myGameArea.context.fillStyle = map[x] == 'unknown' ? 'black' : (map[x] == 'desert' ? '#ffff99' : (map[x] == 'forest' ? 'green' : 'grey'));
+        myGameArea.context.fillRect((x % 1000) * 0.7, Math.floor(x / 1000) * 0.7, 0.7, 0.7);
+    }
+    myGameArea.context.fillStyle = 'red';
+    myGameArea.context.fillRect(xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
+}
+function closeMap() {
+    myGameArea.context.drawImage(ime, 56, 56, 56, 56, 650, 0, 50, 50);
+    if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109]))) {
+        screenNum = 1;
+        myGameArea.keys[109] = false;
+        myGameArea.keys[77] = false;
+    }
+    document.getElementById("canvas").style.cursor = 'default';
 }

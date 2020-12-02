@@ -25,7 +25,6 @@
 }
 function generateBiomes() {
     var colors = ['#ffff99', 'grey'];
-    var cs = document.createElement("CANVAS");
     cs.width = 1000;
     cs.height = 1000;
     var ctx = cs.getContext("2d");

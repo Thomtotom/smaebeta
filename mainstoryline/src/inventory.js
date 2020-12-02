@@ -119,3 +119,15 @@ function dealWithCrafts(arecc) {
         }
     }
 }
+function loadMap() {
+    for (var x = 0; x < 1000000; x++) {
+        map.push('unknown');
+    }
+}
+function updateMap() {
+    for (var x = 0; x < 1000000; x++) {
+        if (((((x % 1000) - xpos) ** 2) + ((Math.floor(x / 1000) - ypos) ** 2)) ** (1 / 2) <= 100) {
+            map[x] = biomes[x];
+        }
+    }
+}
