@@ -1,4 +1,5 @@
-﻿var ime = new Image();
+﻿"use strict";
+var ime = new Image();
 ime.src = 'imgs/system.png';
 var imt = new Image();
 imt.src = 'imgs/tiles-1.png';
@@ -196,7 +197,7 @@ function mob(name) {
                 this.y -= e;
             }
         }
-    }
+    };
     this.dx = function (e) {
         if (e > 0) {
             if (walkable.includes(blocks[(Math.floor(this.y))][Math.ceil(this.x + e)]) && walkable.includes(blocks[(Math.ceil(this.y))][Math.ceil(this.x + e)])) {
@@ -207,7 +208,7 @@ function mob(name) {
                 this.x += e;
             }
         }
-    }
+    };
     this.move = function () {
         if (this.t == 'passive') {
             this.ac++;
@@ -240,7 +241,7 @@ function mob(name) {
         this.t = undefined;
         this.d = undefined;
         this.ng = undefined;
-    }
+    };
 }
 var mobs = [];
 function genMobs() {
@@ -253,10 +254,60 @@ function renMobs() {
         mobs[t].render();
     }
 }
+function openMap() {
+    if (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109])) {
+        screenNum = 3;
+        myGameArea.keys[109] = false;
+        myGameArea.keys[77] = false;
+        mapview = [];
+        for (var x = 0; x < 10000; x++) {
+            var current = [];
+            for (var y = 0; y < 100; y++) {
+                current.push(map[10 * (x % 100) + y % 10 + (width * (10 * Math.floor(x / 100) + Math.floor(y / 10)))]);
+            }
+            var counter = [], counterIndex = [];
+            for (var k in current) {
+                if (counterIndex.includes(current[k])) {
+                    counter[counterIndex.indexOf(current[k])]++;
+                } else {
+                    counterIndex.push(current[k]);
+                    counter.push(1);
+                }
+            }
+            var bm = -Infinity, ind = 0;
+            for (var p in counter) {
+                if (counter[p] > bm) {
+                    bm = counter[p];
+                    ind = p;
+                }
+            }
+            mapview.push(counterIndex[ind]);
+        }
+    }
+}
+function zoom() {
+    if (myGameArea.keys && (myGameArea.keys[90] || myGameArea.keys[122])) {
+        if (screenNum == 3) {
+            screenNum = 4;
+        } else {
+            screenNum = 3;
+        }
+        myGameArea.keys[122] = false;
+        myGameArea.keys[90] = false;
+    }
+}
+function renderChunk() {
+    var chunkX = Math.floor(xpos / 100), chunkY = Math.floor(ypos / 100);
+    for (var x = 0; x < 10000; x++) {
+        myGameArea.context.drawImage(imt,32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[0], 32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[1], 32, 32, 7 * (x % 100), 7 * Math.floor(x / 100), 7, 7);
+    }
+    myGameArea.context.fillStyle = 'red';
+    myGameArea.context.fillRect(7 * (xpos - (chunkX * 100)) - 5, 7 * (ypos - (chunkY * 100)) - 5, 10, 10);
+}
 function renderMap() {
-    for (var x = 0; x < map.length; x++) {
-        myGameArea.context.fillStyle = map[x] == 'unknown' ? 'black' : (map[x] == 'desert' ? '#ffff99' : (map[x] == 'forest' ? 'green' : 'grey'));
-        myGameArea.context.fillRect((x % 1000) * 0.7, Math.floor(x / 1000) * 0.7, 0.7, 0.7);
+    for (var x = 0; x < 10000; x++) {
+        myGameArea.context.fillStyle = mapview[x] == 'unknown' ? 'black' : (mapview[x] == 'desert' ? '#ffff99' : (mapview[x] == 'forest' ? 'green' : 'grey'));
+        myGameArea.context.fillRect((x % 100) * 7, Math.floor(x / 100) * 7, 7, 7);
     }
     myGameArea.context.fillStyle = 'red';
     myGameArea.context.fillRect(xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
