@@ -285,6 +285,12 @@ function openMap() {
         }
     }
 }
+function chooseColor(e) {
+    if (!data.color[e]) {
+        return '#ffffff';
+    }
+    return data.color[e];
+}
 function zoom() {
     if (myGameArea.keys && (myGameArea.keys[90] || myGameArea.keys[122])) {
         if (screenNum == 3) {
@@ -299,10 +305,12 @@ function zoom() {
 function renderChunk() {
     var chunkX = Math.floor(xpos / 100), chunkY = Math.floor(ypos / 100);
     for (var x = 0; x < 10000; x++) {
-        myGameArea.context.drawImage(imt,32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[0], 32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[1], 32, 32, 7 * (x % 100), 7 * Math.floor(x / 100), 7, 7);
+        myGameArea.context.fillStyle = chooseColor(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)]);
+        myGameArea.context.fillRect(7 * (x % 100), 7 * Math.floor(x / 100), 7, 7);
+        //myGameArea.context.drawImage(imt,32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[0], 32 * chooseBlock(blocks[(chunkY * 100) + Math.floor(x / 100)][(chunkX * 100) + (x % 100)])[1], 32, 32, 7 * (x % 100), 7 * Math.floor(x / 100), 7, 7);
     }
     myGameArea.context.fillStyle = 'red';
-    myGameArea.context.fillRect(7 * (xpos - (chunkX * 100)) - 5, 7 * (ypos - (chunkY * 100)) - 5, 10, 10);
+    myGameArea.context.fillRect(7 * (xpos - (chunkX * 100)) - 3.5, 7 * (ypos - (chunkY * 100)) - 3.5, 7, 7);
 }
 function renderMap() {
     for (var x = 0; x < 10000; x++) {
