@@ -1,13 +1,13 @@
 ﻿var data = {
     maxClicks: {
-        r: { def: 10, px: 4, ipx: 2},
-        t4: { def: 10, x: 4, ix: 2},
-        io: { def: 20, px: 10, ipx: 5},
-        co: { def: 15, px: 8, ipx: 4},
-        ch: { def: 5, x: 2, ix: 1},
-        f: { def: 10, px: 5, ipx: 3 },
-        nvp: { def: 10, px: 5, ipx: 3 },
-        db: { def: 2, x: 1, ix: 1 }
+        r: { def: 250, px: 100, ipx: 50},
+        t4: { def: 250, x: 100, ix: 50},
+        io: { def: 500, px: 250, ipx: 125},
+        co: { def: 375, px: 200, ipx: 100},
+        ch: { def: 125, x: 50, ix: 25},
+        f: { def: 250, px: 125, ipx: 75 },
+        nvp: { def: 250, px: 125, ipx: 75 },
+        db: { def: 50, x: 25, ix: 25 }
     },
     dmg: {
         def: 2,
@@ -32,7 +32,7 @@
         [['cs', 1], [['s', 3]], 'none'],
         [['t', 1], [['st', 1], ['gl', 1]], 'none'],
         [['f', 1], [['cs', 10], ['t', 10]], 'none'],
-        [['nv', 1], [['cs', 1], ['ii', 5]], 'none'],
+        [['nv', 1], [['ii', 5]], 'none'],
         [['isw', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ipx', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ix', 1], [['ii', 5], ['st', 10]], 'nvp'],
@@ -61,7 +61,7 @@
         ['ch', 'ch'],
         ['nv', 'nvp'],
     ],
-    walkable: ['g', 't0', 'fb', 'sr', 'ds', 'io', 'co','db'],
+    walkable: ['g', 'sr', 'ds', 'io', 'co', 'db'],
     blockimg: {
         g: [0, 0],
         cs: [1, 0],

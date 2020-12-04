@@ -12,12 +12,59 @@
         return false;
     }
 }
-function dealWithClicks() {
+function interact() {
     var placabli = [];
     for (var e = 0; e < placable.length; e++) {
         placabli.push(placable[e][0]);
     }
-    if (myGameArea.click && myGameArea.x < 700 && myGameArea.x > 0 && myGameArea.y < 700 && myGameArea.y > 0) {
+    if (myGameArea.keys && myGameArea.keys[32]) {
+        var k = true;
+        for (var o = 0; o < mobs.length; o++) {
+            if (((xpos - mobs[o].x) ** 2 + (ypos - mobs[o].y) ** 2) ** (1 / 2) < 1.5 && ((currentDirection == 1) ? (mobs[o].x >= xpos) : (mobs[o].x <= xpos))) {
+                k = false;
+                if (mobs[o].dmgc == 0) {
+                    mobs[o].dmgc = 50;
+                    mobs[o].h -= (data.dmg[inventory[selectIndex][0]] ?? data.dmg['def']);
+                    if (mobs[o].h <= 0) {
+                        mobs[o].die();
+                    } else {
+                        mobs[o].dx(mobs[o].x - xpos);
+                        mobs[o].dy(ypos - mobs[o].y);
+                    }
+                }
+            }
+        }
+        if (k) {
+            if (blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] == defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]]) {
+                if (placabli.includes(inventory[selectIndex] ? (inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no') : 'no')) {
+                    blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = placable[placabli.indexOf(inventory[selectIndex][0])][1];
+                    myGameArea.add(inventory[selectIndex][0], -1);
+                }
+            } else {
+                if (lastClick.x != ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) || lastClick.y != Math.round(ypos)) {
+                    clickCount = 1;
+                } else {
+                    clickCount += 1;
+                } 
+                var a = inventory[selectIndex] ? inventory[selectIndex] : 'def';
+                var mq = maxClicks[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][a[0]] ? maxClicks[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][a[0]] : maxClicks[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]]['def'];
+                var dq = dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][a[0]] ? a[0] : 'def';
+                if (clickCount == mq) {
+                    dropblocs.push({
+                        item: dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][0],
+                        num: Math.floor(Math.random() * (dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][1] - dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0] + 1)) + dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0],
+                        xp: ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)),
+                        yp: Math.round(ypos)
+                    });
+                    blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]]
+                }
+                lastClick.x = ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1));
+                lastClick.y = Math.round(ypos);
+                myGameArea.context.drawImage(imc,32 *  Math.floor(10 * (clickCount / mq)), 0, 32, 32, (((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) - xpos + 3) * 100, (Math.round(ypos) - ypos + 3) * 100, 100, 100);
+            }
+        }
+    }
+    /*if (myGameArea.click && myGameArea.x < 700 && myGameArea.x > 0 && myGameArea.y < 700 && myGameArea.y > 0) {
         if (myGameArea.x > 70 && myGameArea.x < 630 && myGameArea.y > 600 && myGameArea.y < 680) {
             selectIndex = Math.floor((myGameArea.x - 70) / 80);
             clickCount = 1;
@@ -72,8 +119,8 @@ function dealWithClicks() {
                     lastClick.y = Math.floor(ypos + myGameArea.y / 100 - 3);
                 }
             }
-        }
-    }
+        }        
+    }*/
 }
 function clearBlanks() {
     for (var v = 0; v < inventory.length; v++) {

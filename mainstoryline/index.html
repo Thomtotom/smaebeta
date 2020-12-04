@@ -122,15 +122,14 @@
                     screenNum = 1;
                 }
             } else if (screenNum == 1) {
-                dealWithClicks();
                 clearBlanks();
                 renderBlocks();
+                interact();
                 renderDrops();
                 renderPlayer(move());
                 renMobs();
                 renderHotbar();
                 slotSwitch();
-                renderCursor();
                 updateMap();
                 openMap();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {

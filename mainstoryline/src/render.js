@@ -1,6 +1,8 @@
 ﻿"use strict";
 var ime = new Image();
 ime.src = 'imgs/system.png';
+var imc = new Image();
+imc.src = 'imgs/crack.png';
 var imt = new Image();
 imt.src = 'imgs/tiles-1.png';
 var imm = new Image();
@@ -35,7 +37,7 @@ function chooseBlock(e) {
     return [blockimg[e][0], blockimg[e][1],true];
 }
 function renderPlayer(moved) {
-    if (moved) {
+    if (moved || myGameArea.keys[32]) {
         frameCount++;
         if (frameCount >= 5) {
             frameCount = 0;
@@ -47,7 +49,7 @@ function renderPlayer(moved) {
     } else {
         currentLoopIndex = 0;
     }
-    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, 300, 300);
+    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection + (myGameArea.keys[32] ? 4 : (moved ? 0 : 2)), 300, 300);
 }
 function renderHotbar() {
     for (var w = 0; w < 7; w++) {
