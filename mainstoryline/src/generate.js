@@ -13,7 +13,9 @@
                 cy = Math.floor(Math.random() * 994) + 3;
             } 
             for (var n = 0; n < loop; n++) {
-                blocks[cy + (n == 0 ? 1 : (n == 1 ? 2 : (n >= 2 && n <= 9 ? Math.floor((n - 2) / 4) : 1)))][cx + (n == 0 ? 1 : (n == 1 ? 2 : (n >= 2 && n <= 9 ? (n - 2) % 4 : 1)))] = String(p);
+                if (biomes[cy + Math.floor(n / Math.floor(loop ** (1 / 2))) * width + cx + (n % Math.floor(loop ** (1 / 2)))] == 'mountain' && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) > 2 && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) < 997 && cx + (n % Math.floor(loop ** (1 / 2))) > 2 && cx + (n % Math.floor(loop ** (1 / 2))) < 997) {
+                    blocks[cy + Math.floor((n / Math.floor(loop ** (1 / 2))))][cx + (n % Math.floor(loop ** (1 / 2)))] = String(p);
+                }
             }
         }
     }

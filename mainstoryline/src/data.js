@@ -7,7 +7,7 @@
         ch: { def: 125, x: 50, ix: 25},
         f: { def: 250, px: 125, ipx: 75 },
         nvp: { def: 250, px: 125, ipx: 75 },
-        db: { def: 50, x: 25, ix: 25 }
+        db: { def: 50, x: 25, ix: 12  }
     },
     dmg: {
         def: 2,
