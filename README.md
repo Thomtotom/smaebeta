@@ -1,13 +1,8 @@
 # SMAEBETA
 
 ## Bug list:
-- [ ] Fix bug where space crashes if within one block of edge, by x. Because it can't break the void. 
-- [ ] Fix ore spawn bug - ore can spawn in void or non-mountain. Something like this:
-```javascript
-if (genX > 3 && genX < 997 && genY > 3 && genY < 997 && biomes[genY * width + genX] == 'mountain'){
-  blocks[genY][genX] = 'co';
-}
-```
+- [x] ~~Fix bug where space crashes if within one block of edge, by x. Because it can't break the void~~ 
+- [x] ~~Fix ore spawn bug - ore can spawn in void or non-mountain. Something like this~~
 - [ ] Fix knockback - Should repeatedly move a little bit when hit so doesn't teleport, total distance 1 block. 
 
 ## To do:
