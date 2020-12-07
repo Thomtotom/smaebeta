@@ -28,8 +28,10 @@ function interact() {
                     if (mobs[o].h <= 0) {
                         mobs[o].die();
                     } else {
-                        mobs[o].dx(mobs[o].x - xpos);
-                        mobs[o].dy(ypos - mobs[o].y);
+                        for (var p = 0; p < 100; p++) {
+                            mobs[o].dx((-1 * Math.cos(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100);
+                            mobs[o].dy((-1 * Math.sin(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100);
+                        }
                     }
                 }
             }
