@@ -7,6 +7,23 @@ var imt = new Image();
 imt.src = 'imgs/tiles-1.png';
 var imm = new Image();
 imm.src = 'imgs/mobnew.png';
+var imh = new Image();
+imh.src = 'imgs/system-32.png';
+function renderHealth() {
+    for (var x = 0; x < playerHealth; x++) {
+        myGameArea.context.drawImage(imh, (playerHealth % 2 == 1 && x == playerHealth - 1 ? 96 :(x % 2 >= 1 ? 64 : 32)), 0, 32, 32, 6 + 16 * (x % 20), 568 - 32 * Math.floor(x / 20), 32, 32);
+    }
+    for (var x = playerHealth; x < maxHealth; x++) {
+        myGameArea.context.drawImage(imh, (maxHealth % 2 == 1 && x == maxHealth - 1 ? 192 : (x % 2 >= 1 ? 160 : 128)), 0, 32, 32, 6 + 16 * (x % 20), 568 - 32 * Math.floor(x / 20), 32, 32);
+    }
+    if (playerHealth < maxHealth) {
+        regenCount++;
+        if (regenCount == 50) {
+            regenCount = 0;
+            playerHealth++;
+        }
+    }
+}
 function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
         var dq = chooseBlock(dropblocs[b].item);
