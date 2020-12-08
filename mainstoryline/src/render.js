@@ -66,7 +66,16 @@ function renderPlayer(moved) {
     } else {
         currentLoopIndex = 0;
     }
-    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection + (myGameArea.keys[32] ? 4 : (moved ? 0 : 2)), 300, 300);
+    for (var x = 0; x < mobs.length; x++) {
+        if ((((mobs[x].x - xpos) ** 2) + ((mobs[x].y - ypos) ** 2)) ** (1 / 2) < 1 / 2 && dmgcount == 0) {
+            dmgcount = 12;
+            playerHealth--;
+        }
+    }
+    if (dmgcount > 0) {
+        dmgcount--;
+    }
+    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection + (myGameArea.keys[32] ? 4 : (moved ? 0 : 2)) + (dmgcount > 0 ? 6 : 0), 300, 300);
 }
 function renderHotbar() {
     for (var w = 0; w < 7; w++) {
@@ -234,6 +243,17 @@ function mob(name) {
             if (this.ac == 50) {
                 this.ac = 0;
                 this.ng = Math.random() * Math.PI * 2;
+            }
+        }
+        if (this.t == 'hostile') {
+            if ((((this.x - xpos) ** 2) + ((this.y - ypos) ** 2)) ** (1 / 2) < 5) {
+                this.ng = Math.atan2(this.y - ypos, xpos - this.x);
+            } else {
+                this.ac++;
+                if (this.ac == 50) {
+                    this.ac = 0;
+                    this.ng = Math.random() * Math.PI * 2;
+                }
             }
         }
         this.dx(Math.cos(this.ng) * this.s);

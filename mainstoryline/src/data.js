@@ -7,7 +7,8 @@
         ch: { def: 125, x: 50, ix: 25},
         f: { def: 250, px: 125, ipx: 75 },
         nvp: { def: 250, px: 125, ipx: 75 },
-        db: { def: 50, x: 25, ix: 12  }
+        db: { def: 50, x: 25, ix: 12 },
+        lp: { def: 50, x: 25, ix: 12}
     },
     dmg: {
         def: 2,
@@ -50,6 +51,7 @@
         nvp: { def: ['nv', [1, 1]] },
         ch: { def: ['ch', [1, 1]] },
         db: { def: ['st', [1, 3]] },
+        lp: { def: ['l', [1, 1]] },
     },
     defaultTile: {
         forest: 'g',
@@ -60,6 +62,7 @@
         ['f', 'f'],
         ['ch', 'ch'],
         ['nv', 'nvp'],
+        ['l', 'lp'],
     ],
     walkable: ['g', 'sr', 'ds', 'io', 'co', 'db'],
     blockimg: {
@@ -108,13 +111,13 @@
                 dl: 2,
                 dr: 3,
             },
-            type: 'passive',
+            type: 'hostile',
             spawn: 'forest',
             speed: 0.02,
             health: 10,
-            drop: [['gl', [1, 3]]],
+            drop: [['gl', [0, 2]]],
             framerate: 5,
-            cycleLoop: [0,1,2,3,4,5,6,7,8],
+            cycleLoop: [0, 1, 2, 3, 4, 5, 6, 7, 8],
         }
     }
 };

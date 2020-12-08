@@ -1,4 +1,5 @@
 # SMAEBETA
+https://smae.surge.sh
 ## Bug list:
 - [x] All known bugs fixed
 ## To do:
@@ -18,7 +19,7 @@
 - [ ] Achievements?
 - [ ] Storyline - Someone stole Smae, your pet radish. 
 - [ ] Boss battles - Platformer-style. See [Temple](https://theostestrpg.surge.sh/temple.html), but obviously much better. 
-- [ ] Hostile mobs
+- [x] Hostile mobs
 
 ## To do in a long time:
 - [ ] Other worlds:
@@ -28,7 +29,7 @@
   - Endgame - Story?
 - [ ] Deploy app - Electron? :electron:
 - [ ] Some sort of save feature - see Electron and figure something out.
-- [ ] Ranged weapons - straight. 
+- [ ] Ranged weapons - straight.
 
 ## To do once the entire game is done:
 - [ ] Make your own canvas scroller app
