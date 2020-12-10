@@ -70,9 +70,8 @@ function interact() {
 function clearBlanks() {
     for (var v = 0; v < inventory.length; v++) {
         if (inventory[v][1] === 0) {
-            inventory.push(['e' + count, '']);
-            inventory.splice(v, 1);
-            count++;
+            inventory[v][0] = 'e';
+            inventory[v][1] = '';
         }
     }
 }
@@ -81,13 +80,29 @@ function dealWithSwaps() {
         if (invIndex == -1) {
             invIndex = Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56);
         } else {
-            var f = [];
-            for (var p = 0; p < inventory.length; p++) {
-                f.push(inventory[p][0]);
+            if (myGameArea.keys && myGameArea.keys[16] && inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][1] === '') {
+                var k = Math.floor(inventory[invIndex][1] / 2);
+                var a = Math.ceil(inventory[invIndex][1] / 2);
+                inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0] = inventory[invIndex][0];
+                inventory[invIndex][1] = k;
+                inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][1] = a;
+            } else {
+                if (inventory[invIndex][0] == inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0]) {
+                    var q = Math.min(inventory[invIndex][1], (data.ms[inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0]] ?? 64) - inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][1]);
+                    if (q == 0) {
+                        var h = inventory[invIndex];
+                        inventory[invIndex] = inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)];
+                        inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)] = h;
+                    } else {
+                        inventory[invIndex][1] -= q;
+                        inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][1] += q;
+                    }
+                } else {
+                    var h = inventory[invIndex];
+                    inventory[invIndex] = inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)];
+                    inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)] = h;
+                }
             }
-            var h = inventory[f.indexOf(inventory[invIndex][0])];
-            inventory[f.indexOf(inventory[invIndex][0])] = inventory[f.indexOf(inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])];
-            inventory[f.indexOf(inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0])] = h;
             invIndex = -1;
         }
         myGameArea.click = false;
@@ -104,7 +119,7 @@ function dealWithCrafts(arecc) {
                 t.push(inventory[p][0]);
             }
             for (r in arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1]) {
-                inventory[t.indexOf(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0])][1] -= arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][1];
+                myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0], -1 * arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][1]);
                 arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r];
             }
             myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][0], arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][1]);
@@ -121,5 +136,16 @@ function updateMap() {
         if (((((x % 1000) - xpos) ** 2) + ((Math.floor(x / 1000) - ypos) ** 2)) ** (1 / 2) <= 100) {
             map[x] = biomes[x];
         }
+    }
+}
+function throwItems() {
+    if (myGameArea.keys && (myGameArea.keys[113] || myGameArea.keys[81])) {
+        dropblocs.push({
+            item: inventory[selectIndex][0],
+            num: inventory[selectIndex][1],
+            yp: ypos,
+            xp: xpos + (((currentDirection * 2) - 1) * 3)
+        });
+        myGameArea.add(inventory[selectIndex][0], -1 * inventory[selectIndex][1]);
     }
 }

@@ -20,6 +20,7 @@ https://smae.surge.sh
 - [ ] Storyline - Someone stole Smae, your pet radish. 
 - [ ] Boss battles - Platformer-style. See [Temple](https://theostestrpg.surge.sh/temple.html), but obviously much better. 
 - [x] Hostile mobs
+- [x] Massive inventory overhaul, including multiple stacks, stack limits, throw items, trash, stack splitting, and several bugs that popped up along the way. 
 
 ## To do in a long time:
 - [ ] Other worlds:

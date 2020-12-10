@@ -1,14 +1,17 @@
 ﻿var data = {
     maxClicks: {
-        r: { def: 250, px: 100, ipx: 50},
-        t4: { def: 250, x: 100, ix: 50},
-        io: { def: 500, px: 250, ipx: 125},
-        co: { def: 375, px: 200, ipx: 100},
-        ch: { def: 125, x: 50, ix: 25},
+        r: { def: 250, px: 100, ipx: 50 },
+        t4: { def: 250, x: 100, ix: 50 },
+        io: { def: 500, px: 250, ipx: 125 },
+        co: { def: 375, px: 200, ipx: 100 },
+        ch: { def: 125, x: 50, ix: 25 },
         f: { def: 250, px: 125, ipx: 75 },
         nvp: { def: 250, px: 125, ipx: 75 },
         db: { def: 50, x: 25, ix: 12 },
-        lp: { def: 50, x: 25, ix: 12}
+        lp: { def: 50, x: 25, ix: 12 },
+    },
+    ms: {
+        x: 1, px: 1, bx: 1, sw: 1, ix: 1, ipx: 1, ibx: 1, isw: 1,
     },
     dmg: {
         def: 2,

@@ -29,7 +29,14 @@ function renderDrops() {
         var dq = chooseBlock(dropblocs[b].item);
         if (dropblocs[b].num > 0) {
             myGameArea.context.drawImage(imt, dq[0] * 32, dq[1] * 32, 32, 32, (dropblocs[b].xp - xpos + 3.3) * 100, (dropblocs[b].yp - ypos + 3.3) * 100, 40, 40);
-            if ((((xpos - dropblocs[b].xp) ** 2) + ((ypos - dropblocs[b].yp) ** 2)) ** (1 / 2) <= 1) {
+            var k = 0;
+            for (var x = 0; x < inventory.length; x++) {
+                if (inventory[x][1] == '' || (inventory[x][0] == dropblocs[b].item && inventory[x][1] < (data.ms[dropblocs[b].item] ?? 64))) {
+                    k = 1;
+                    break;
+                }
+            }
+            if ((((xpos - dropblocs[b].xp) ** 2) + ((ypos - dropblocs[b].yp) ** 2)) ** (1 / 2) <= 1 && k == 1) {
                 myGameArea.add(dropblocs[b].item, dropblocs[b].num);
                 dropblocs.splice(b, 1);
             }
@@ -52,6 +59,12 @@ function chooseBlock(e) {
         return [200, 200,false];
     }
     return [blockimg[e][0], blockimg[e][1],true];
+}
+function renderTrash() {
+    myGameArea.context.drawImage(imh, 224, 0, 32, 32, 636, 50, 64, 64);
+    if (myGameArea.x > 636 && myGameArea.x < 700 && myGameArea.y > 50 && myGameArea.y < 114 && myGameArea.click && invIndex != -1) {
+        inventory[invIndex] = ['e', ''];
+    }
 }
 function renderPlayer(moved) {
     if (moved || myGameArea.keys[32]) {
@@ -84,9 +97,11 @@ function renderHotbar() {
         if (inventory[w]) {
             var gx = chooseBlock(inventory[w][0])[0] * 32, gy = chooseBlock(inventory[w][0])[1] * 32;
             myGameArea.context.drawImage(imt, gx, gy, 32, 32, 75 + (80 * w), 605, 70, 70);
-            myGameArea.context.font = '20px Arial';
-            myGameArea.context.fillStyle = 'white';
-            myGameArea.context.fillText(inventory[w][1], 105 + w * 80, 675);
+            if (inventory[w][1] > 1) {
+                myGameArea.context.font = '20px Arial';
+                myGameArea.context.fillStyle = 'white';
+                myGameArea.context.fillText(inventory[w][1], 105 + w * 80, 675);
+            }
         }
     }
 }
@@ -95,9 +110,11 @@ function renderItems() {
         var gx = chooseBlock(inventory[y][0])[0] * 32, gy = chooseBlock(inventory[y][0])[1] * 32;
         myGameArea.context.drawImage(ime, (y != invIndex ? (y <= 6 ? 56 : 0) : (y <= 6 ? 0 : 112)), y != invIndex ? 0 : (y <= 6 ? 56 : 0),56,56,50 + (56 * (y % 10)), 50 + 56 * Math.floor(y / 10), 56, 56);
         myGameArea.context.drawImage(imt, gx, gy, 32, 32, 53 + (56 * (y % 10)), 53 + 56 * Math.floor(y / 10), 50, 50);
-        myGameArea.context.font = '15px Arial';
-        myGameArea.context.fillStyle = 'white';
-        myGameArea.context.fillText(inventory[y][1], 80 + (y % 10) * 56, 100 + 56 * Math.floor(y / 10));
+        if (inventory[y][1] > 1) {
+            myGameArea.context.font = '15px Arial';
+            myGameArea.context.fillStyle = 'white';
+            myGameArea.context.fillText(inventory[y][1], 80 + (y % 10) * 56, 100 + 56 * Math.floor(y / 10));
+        }
     }
 }
 function renderRecipes() {
@@ -105,11 +122,15 @@ function renderRecipes() {
     for (var x = 0; x < recipes.length; x++) {
         var o = 0;
         for (var m = 0; m < recipes[x][1].length; m++) {
-            var t = [];
+            var i = {};
             for (var p = 0; p < inventory.length; p++) {
-                t.push(inventory[p][0]);
+                if (!i[inventory[p][0]]) {
+                    i[inventory[p][0]] = inventory[p][1];
+                } else {
+                    i[inventory[p][0]] += inventory[p][1];
+                }
             }
-            if (t.indexOf(recipes[x][1][m][0]) == -1 || inventory[t.indexOf(recipes[x][1][m][0])][1] < recipes[x][1][m][1]) {
+            if (!i[recipes[x][1][m][0]] || i[recipes[x][1][m][0]] < recipes[x][1][m][1]) {
                 o = 1;
             }
         }
@@ -160,14 +181,6 @@ function slotSwitch() {
     }
     if (myGameArea.keys && myGameArea.keys[55]) {
         selectIndex = 6;
-    }
-}
-function renderCursor() {
-    if (chooseBlock(inventory[selectIndex][0])[2]) {
-        document.getElementById("canvas").style.cursor = 'none';
-        myGameArea.context.drawImage(imt, 32 * chooseBlock(inventory[selectIndex][0])[0], 32 * chooseBlock(inventory[selectIndex][0])[1], 32, 32, myGameArea.ax - 32, myGameArea.ay - 32, 64, 64);
-    } else {
-        document.getElementById("canvas").style.cursor = 'default';
     }
 }
 function mob(name) {

@@ -19,7 +19,7 @@
 </head>
 <body onload="startGame()">
     <script>
-        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [['e1', ''], ['e2', ''], ['e3', ''], ['e4', ''], ['e5', ''], ['e6', ''], ['e7', ''], ['e8', ''], ['e9', ''], ['e10', ''], ['e11', ''], ['e12', ''], ['e13', ''], ['e14', ''], ['e15', ''], ['e16', ''], ['e17', ''], ['e18', ''], ['e19', ''], ['e20', ''], ['e21', ''], ['e22', ''], ['e23', ''], ['e24', ''], ['e25', ''], ['e26', ''], ['e27', ''], ['e28', ''], ['e29', ''], ['e30', '']], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0;
+        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0;
         bImage.src = 'imgs/index wp.png';
         function startGame() {
             for (var i = 0; i < height; i++) {
@@ -34,6 +34,9 @@
             blockimg = data.blockimg;
             myGameArea.start();
             myGameArea.context.imageSmoothingEnabled = false;
+            for (var x = 0; x < 30; x++) {
+                inventory.push(['e', '']);
+            }
         }
         var myGameArea = {
             keys: [],
@@ -44,20 +47,52 @@
                 blocks[Math.floor(ypos + myGameArea.y / 100 - 3)][Math.floor(xpos + myGameArea.x / 100 - 3)] = e;
             },
             add: function (c, n) {
-                var p = 0;
-                for (var x = 0; x < inventory.length; x++) {
-                    if (inventory[x][0] == c) {
-                        inventory[x][1] += n;
-                        p = 1;
-                        break;
+                if (n > 0) {
+                    var ex = 0;
+                    for (var k = 0; k < n; k++) {
+                        var p = 0;
+                        for (var x = 0; x < inventory.length; x++) {
+                            if (inventory[x][0] == c && inventory[x][1] < (data.ms[inventory[x][0]] ?? 64)) {
+                                inventory[x][1] += 1;
+                                p = 1;
+                                break;
+                            }
+                        }
+                        var q = 0;
+                        if (p == 0) {
+                            for (var w = 0; w < inventory.length; w++) {
+                                if (inventory[w][1] === '') {
+                                    inventory[w][1] = 1;
+                                    inventory[w][0] = c;
+                                    q = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (q == 0 && p == 0) {
+                            ex++;
+                        }
                     }
-                }
-                if (p == 0) {
-                    for (var w = 0; w < inventory.length; w++) {
-                        if (inventory[w][1] === '') {
-                            inventory[w][1] = n;
-                            inventory[w][0] = c;
-                            break;
+                    if (ex > 0) {
+                        dropblocs.push({
+                            xp: xpos,
+                            yp: ypos,
+                            item: c,
+                            num: ex
+                        });
+                    }
+                } else if (n < 0) {
+                    if (inventory[selectIndex][0] == c) {
+                        inventory[selectIndex][1] += n;
+                    } else {
+                        for (var k = 0; k < Math.abs(n); k++) {
+                            for (var x = inventory.length - 1; x >= 0; x--) {
+                                if (inventory[x][0] == c) {
+                                    inventory[x][1] -= 1;
+                                    break;
+                                }
+                            }
+                            clearBlanks();
                         }
                     }
                 }
@@ -133,6 +168,7 @@
                 slotSwitch();
                 updateMap();
                 openMap();
+                throwItems();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
@@ -144,6 +180,7 @@
                 closeInventory();
                 renderItems();
                 clearBlanks();
+                renderTrash();
                 dealWithSwaps();
                 dealWithCrafts(renderRecipes());
             } else if (screenNum == 3) {
