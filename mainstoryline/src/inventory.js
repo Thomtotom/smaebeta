@@ -110,21 +110,28 @@ function dealWithSwaps() {
         invIndex = -1;
     }
 }
-function dealWithCrafts(arecc) {
+function dealWithCrafts(k) {
+    var arecc = [];
+    for (var x = 0; x < k.length; x++) {
+        if (k[x][1] == 'y') {
+            arecc.push(k[x][0]);
+        }
+    }
     if (myGameArea.click && myGameArea.x < 610 && myGameArea.y > 250 && myGameArea.x > 50) {
         myGameArea.click = false;
-        if (arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)]) {
+        if (arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)]) {
             var t = [];
             for (var p = 0; p < inventory.length; p++) {
                 t.push(inventory[p][0]);
             }
             for (r in arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1]) {
-                myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0], -1 * arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][1]);
-                arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r];
+                myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][1][r][0], -1 * arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)][1][r][1]);
+                arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)][1][r];
             }
             myGameArea.add(arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][0], arecc[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56)][0][1]);
         }
     }
+    return k;
 }
 function loadMap() {
     for (var x = 0; x < 1000000; x++) {

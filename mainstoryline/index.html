@@ -19,7 +19,7 @@
 </head>
 <body onload="startGame()">
     <script>
-        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0;
+        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [];
         bImage.src = 'imgs/index wp.png';
         function startGame() {
             for (var i = 0; i < height; i++) {
@@ -181,8 +181,10 @@
                 renderItems();
                 clearBlanks();
                 renderTrash();
+                renderHoverItem();
                 dealWithSwaps();
-                dealWithCrafts(renderRecipes());
+                renderPages();
+                renderHoverCraft(dealWithCrafts(renderRecipes()));
             } else if (screenNum == 3) {
                 renderMap();
                 closeMap();

@@ -21,6 +21,7 @@ https://smae.surge.sh
 - [ ] Boss battles - Platformer-style. See [Temple](https://theostestrpg.surge.sh/temple.html), but obviously much better. 
 - [x] Hostile mobs
 - [x] Massive inventory overhaul, including multiple stacks, stack limits, throw items, trash, stack splitting, and several bugs that popped up along the way. 
+- [x] Data on hover / possible recipes / pagination for crafting(Useless because we only have a few recipes, but works) / Recipe on hover (shift). 
 
 ## To do in a long time:
 - [ ] Other worlds:
@@ -31,6 +32,22 @@ https://smae.surge.sh
 - [ ] Deploy app - Electron? :electron:
 - [ ] Some sort of save feature - see Electron and figure something out.
 - [ ] Ranged weapons - straight.
+- [ ] Calculate actual width of string for better data show
 
 ## To do once the entire game is done:
 - [ ] Make your own canvas scroller app
+
+## Game controls:
+- Movement: WASD / Arrows
+- Throw item: Q
+- Inventory: E
+- Map: M
+- Attack / Place / Mine: Space
+- Select item in hotbar: 1 to 7
+### In inventory:
+- See data: hover over item
+- Swap items: Select one, then click on the other.
+- Merge stacks: Select one, then click on the other. 
+- Split: Select the stack you want to split, then shift+click on an empty cell.
+- Delete: Select the item you want to delete, then click on the trashcan.
+- See recipe: shift+hover over item in crafting list.

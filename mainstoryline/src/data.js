@@ -41,7 +41,6 @@
         [['ipx', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ix', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ibx', 1], [['ii', 10], ['st', 10]], 'nvp'],
-        [['cbf', 1], [['bf', 1], ['c', 1]], 'f'],
     ],
     dropitem: {
         r: { def: ['s', [1, 2]] },
@@ -122,5 +121,28 @@
             framerate: 5,
             cycleLoop: [0, 1, 2, 3, 4, 5, 6, 7, 8],
         }
+    },
+    viewdata: {
+        cs: 'Cobblestone',
+        f: 'Furnace*Placable*Smelts iron',
+        t: 'Torch',
+        sw: 'Sword*+4 damage',
+        l: 'Log*Placable',
+        s: 'Rock',
+        p: 'Planks',
+        st: 'Stick',
+        px: 'Pickaxe*Breaks rocks faster*Mines coal/iron*+2 damage',
+        x: 'Axe*Cuts trees faster*+3 damage',
+        bx: 'Battleaxe*+5 damage',
+        io: 'Iron ore',
+        c: 'Coal',
+        ii: 'Iron ingot',
+        ch: 'Chest*Placable',
+        isw: 'Iron sword*+7 damage',
+        ipx: 'Iron pickaxe*Mines even faster*+5 damage',
+        ix: 'Iron axe*Cuts trees even faster*+6 damage',
+        ibx: 'Iron battleaxe*+8 damage',
+        nv: 'Anvil*Crafts iron tools',
+        gl: 'Gel'
     }
 };
