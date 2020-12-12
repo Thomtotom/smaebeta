@@ -19,10 +19,6 @@
             }
         }
     }
-    while (blocks[ypos][xpos] != 'g') {
-        xpos = Math.floor(Math.random() * 990) + 5;
-        ypos = Math.floor(Math.random() * 990) + 5;
-    }
     genMobs();
 }
 function generateBiomes() {

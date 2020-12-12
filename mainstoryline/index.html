@@ -17,9 +17,8 @@
         }
     </style>
 </head>
-<body onload="startGame()">
-    <script>
-        var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [];
+<body onload="loadFile(['data.js', 'render.js', 'generate.js', 'inventory.js', 'motion.js', 'mob.js', 'map.js', 'inventoryrender.js'])">
+    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000;
         bImage.src = 'imgs/index wp.png';
         function startGame() {
             for (var i = 0; i < height; i++) {
@@ -147,12 +146,32 @@
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             }
         };
+        function loadFile(src) {
+            for (var q = 0; q < src.length; q++) {
+                var script = document.createElement('SCRIPT');
+                script.src = 'src/' + src[q];
+                document.body.appendChild(script);
+                if (q == src.length - 1) {
+                    script.onload = () => {
+                        startGame();
+                    }
+                }
+            }
+        }
         function updateGameArea() {
             myGameArea.clear();
             if (screenNum == 0) {
                 myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
                 if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
                     loadTiles();
+                    spawnx = Math.floor(Math.random() * 990) + 5;
+                    spawny = Math.floor(Math.random() * 990) + 5;
+                    while (blocks[spawny][spawnx] != 'g') {
+                        spawnx = Math.floor(Math.random() * 990) + 5;
+                        spawny = Math.floor(Math.random() * 990) + 5;
+                    }
+                    xpos = spawnx;
+                    ypos = spawny;
                     loadMap();
                     screenNum = 1;
                 }
@@ -188,14 +207,11 @@
             } else if (screenNum == 3) {
                 renderMap();
                 closeMap();
+            } else if (screenNum == 4) {
+                renderDeath();
             }
         }
     </script>
-    <script src="src/data.js"></script>
-    <script src="src/motion.js"></script>
-    <script src="src/generate.js"></script>
-    <script src="src/render.js"></script>
-    <script src="src/inventory.js"></script>
     <canvas id="canvas"></canvas>
 </body>
 </html>

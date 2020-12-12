@@ -1,12 +1,12 @@
 ﻿var data = {
     maxClicks: {
-        r: { def: 250, px: 100, ipx: 50 },
-        t4: { def: 250, x: 100, ix: 50 },
-        io: { def: 500, px: 250, ipx: 125 },
-        co: { def: 375, px: 200, ipx: 100 },
-        ch: { def: 125, x: 50, ix: 25 },
-        f: { def: 250, px: 125, ipx: 75 },
-        nvp: { def: 250, px: 125, ipx: 75 },
+        r: { def: 100, px: 50, ipx: 25 },
+        t4: { def: 200, x: 100, ix: 50 },
+        io: { def: 300, px: 150, ipx: 75 },
+        co: { def: 200, px: 100, ipx: 50 },
+        ch: { def: 100, x: 50, ix: 25 },
+        f: { def: 200, px: 100, ipx: 50 },
+        nvp: { def: 200, px: 100, ipx: 50 },
         db: { def: 50, x: 25, ix: 12 },
         lp: { def: 50, x: 25, ix: 12 },
     },
@@ -43,7 +43,7 @@
         [['ibx', 1], [['ii', 10], ['st', 10]], 'nvp'],
     ],
     dropitem: {
-        r: { def: ['s', [1, 2]] },
+        r: { def: ['s', [1, 1]] },
         t4: { def: ['l', [4, 7]] },
         lp: { def: ['l', [1, 1]] },
         fb: { def: ['fb', [1, 1]] },

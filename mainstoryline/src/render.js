@@ -23,6 +23,22 @@ function renderHealth() {
             playerHealth++;
         }
     }
+    if (playerHealth <= 0) {
+        screenNum = 4;
+        for (var o = 0; o < inventory.length; o++) {
+            dropblocs.push({
+                xp: xpos,
+                yp: ypos,
+                item: inventory[o][0],
+                num: inventory[o][1],
+            });
+            inventory[o] = ['e', ''];
+        }
+        deathX = xpos;
+        deathY = ypos;
+        xpos = spawnx;
+        ypos = spawny;
+    }
 }
 function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
@@ -59,12 +75,6 @@ function chooseBlock(e) {
         return [200, 200,false];
     }
     return [blockimg[e][0], blockimg[e][1],true];
-}
-function renderTrash() {
-    myGameArea.context.drawImage(imh, 224, 0, 32, 32, 636, 50, 64, 64);
-    if (myGameArea.x > 636 && myGameArea.x < 700 && myGameArea.y > 50 && myGameArea.y < 114 && myGameArea.click && invIndex != -1) {
-        inventory[invIndex] = ['e', ''];
-    }
 }
 function renderPlayer(moved) {
     if (moved || myGameArea.keys[32]) {
@@ -105,90 +115,6 @@ function renderHotbar() {
         }
     }
 }
-function renderItems() {
-    for (var y = 0; y < 30; y++) {
-        var gx = chooseBlock(inventory[y][0])[0] * 32, gy = chooseBlock(inventory[y][0])[1] * 32;
-        myGameArea.context.drawImage(ime, (y != invIndex ? (y <= 6 ? 56 : 0) : (y <= 6 ? 0 : 112)), y != invIndex ? 0 : (y <= 6 ? 56 : 0),56,56,50 + (56 * (y % 10)), 50 + 56 * Math.floor(y / 10), 56, 56);
-        myGameArea.context.drawImage(imt, gx, gy, 32, 32, 53 + (56 * (y % 10)), 53 + 56 * Math.floor(y / 10), 50, 50);
-        if (inventory[y][1] > 1) {
-            myGameArea.context.font = '15px Arial';
-            myGameArea.context.fillStyle = 'white';
-            myGameArea.context.fillText(inventory[y][1], 80 + (y % 10) * 56, 100 + 56 * Math.floor(y / 10));
-        }
-    }
-}
-function renderRecipes() {
-    var arec = [], arecc = [];
-    for (var x = 0; x < recipes.length; x++) {
-        var o = 0;
-        for (var m = 0; m < recipes[x][1].length; m++) {
-            var i = {};
-            for (var p = 0; p < inventory.length; p++) {
-                if (!i[inventory[p][0]]) {
-                    i[inventory[p][0]] = inventory[p][1];
-                } else {
-                    i[inventory[p][0]] += inventory[p][1];
-                }
-            }
-            if (!i[recipes[x][1][m][0]] || i[recipes[x][1][m][0]] < recipes[x][1][m][1]) {
-                o = 1;
-            }
-        }
-        if (o == 0 && isNearby(recipes[x][2])) {
-            arec.push(recipes[x][0][0]);
-            arecc.push(recipes[x]);
-        }
-    }
-    var precc = [], a = [], alrec = [];
-    for (var v = 0; v < arecc.length; v++) {
-        a.push(arecc[v][0][0]);
-    }
-    for (var x = 0; x < recipes.length; x++) {
-        var o = 0;
-        for (var m = 0; m < recipes[x][1].length; m++) {
-            var i = [];
-            for (var p = 0; p < inventory.length; p++) {
-                i.push(inventory[p][0]);
-            }
-            if (i.includes(recipes[x][1][m][0]) && !a.includes(recipes[x][0][0])) {
-                o = 1;
-                break;
-            }
-        }
-        if (o == 1 || (recipes[x][2] == 'none' ? false : isNearby(recipes[x][2]))) {
-            precc.push(recipes[x]);
-        }
-    }
-    for (var k in arecc) {
-        alrec.push([arecc[k], 'y']);
-    }
-    for (var b in precc) {
-        alrec.push([precc[b], 'n']);
-    }
-    for (var q = 0; q < Math.min(70, alrec.length - (pagenum * 70)); q++) {
-        var gx = chooseBlock(alrec[q + (pagenum * 70)][0][0][0])[0] * 32, gy = chooseBlock(alrec[q + (pagenum * 70)][0][0][0])[1] * 32;
-        myGameArea.context.fillStyle = alrec[q + (pagenum * 70)][1] == 'y' ? 'grey' : 'maroon';
-        myGameArea.context.fillRect(50 + (56 * (q % 10)), 250 + 56 * Math.floor(q / 10), 56, 56);
-        myGameArea.context.font = '15px Arial';
-        myGameArea.context.fillStyle = 'white';
-        myGameArea.context.drawImage(imt, gx, gy, 32, 32, 53 + (56 * (q % 10)), 253 + 56 * Math.floor(q / 10), 50, 50);
-        if (alrec[q + (pagenum * 70)][0][0][1] > 1) {
-            myGameArea.context.fillText(alrec[q + (pagenum * 70)][0][0][1], 80 + (q % 10) * 56, 300 + 56 * Math.floor(q / 10));
-        }
-    }
-    pages = Math.ceil(alrec.length / 70);
-    return alrec;
-}
-function closeInventory() {
-    myGameArea.context.drawImage(ime, 56, 56, 56, 56, 650, 0, 50, 50);
-    if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101]))) {
-        screenNum = 1;
-        myGameArea.keys[101] = false;
-        myGameArea.keys[69] = false;
-        invIndex = -1;
-    }
-    document.getElementById("canvas").style.cursor = 'default';
-}
 function slotSwitch() {
     if (myGameArea.keys && myGameArea.keys[49]) {
         selectIndex = 0;
@@ -212,237 +138,19 @@ function slotSwitch() {
         selectIndex = 6;
     }
 }
-function mob(name) {
-    this.x = Math.floor(Math.random() * 994) + 3; this.y = Math.floor(Math.random() * 994) + 3;
-    while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
-        this.x = Math.floor(Math.random() * 994) + 3;
-        this.y = Math.floor(Math.random() * 994) + 3;
-    }
-    this.dmgc = 0;
-    this.ch = true;
-    this.h = data.mobs[name].health;
-    this.t = data.mobs[name].type;
-    this.ng = 0;
-    this.d = data.mobs[name].drop;
-    this.fc = 0;
-    this.fi = 0;
-    this.l = data.mobs[name].cycleLoop;
-    this.render = function () {
-        if (this.ch) {
-            this.move();
-            if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
-                this.fc++;
-                if (this.fc == data.mobs[name].framerate) {
-                    this.fc = 0;
-                    this.fi++;
-                    if (this.fi == this.l.length - 1) {
-                        this.fi = 0;
-                    }
-                }
-                if (this.dmgc > 0) {
-                    this.dmgc--;
-                    if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dr'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
-                    } else {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dl'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
-                    }
-                } else {
-                    if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['r'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
-                    } else {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['l'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
-                    }
-                }
-            }
-        }
-    }; 
-    this.ac = 0;
-    this.dy = function (e) {
-        if (e > 0) {
-            if (walkable.includes(blocks[(Math.floor(this.y - e))][Math.floor(this.x)]) && walkable.includes(blocks[(Math.floor(this.y - e))][Math.ceil(this.x)])) {
-                this.y -= e;
-            }
-        } else {
-            if (walkable.includes(blocks[(Math.ceil(this.y + e))][Math.floor(this.x)]) && walkable.includes(blocks[(Math.ceil(this.y + e))][Math.ceil(this.x)])) {
-                this.y -= e;
-            }
-        }
-    };
-    this.dx = function (e) {
-        if (e > 0) {
-            if (walkable.includes(blocks[(Math.floor(this.y))][Math.ceil(this.x + e)]) && walkable.includes(blocks[(Math.ceil(this.y))][Math.ceil(this.x + e)])) {
-                this.x += e;
-            }
-        } else {
-            if (walkable.includes(blocks[(Math.floor(this.y))][Math.floor(this.x - e)]) && walkable.includes(blocks[(Math.ceil(this.y))][Math.floor(this.x - e)])) {
-                this.x += e;
-            }
-        }
-    };
-    this.move = function () {
-        if (this.t == 'passive') {
-            this.ac++;
-            if (this.ac == 50) {
-                this.ac = 0;
-                this.ng = Math.random() * Math.PI * 2;
-            }
-        }
-        if (this.t == 'hostile') {
-            if ((((this.x - xpos) ** 2) + ((this.y - ypos) ** 2)) ** (1 / 2) < 5) {
-                this.ng = Math.atan2(this.y - ypos, xpos - this.x);
-            } else {
-                this.ac++;
-                if (this.ac == 50) {
-                    this.ac = 0;
-                    this.ng = Math.random() * Math.PI * 2;
-                }
-            }
-        }
-        this.dx(Math.cos(this.ng) * this.s);
-        this.dy(Math.sin(this.ng) * this.s);
-    };
-    this.s = data.mobs[name].speed;
-    this.die = function () {
-        for (p in this.d) {
-            dropblocs.push({
-                item: this.d[p][0],
-                num: Math.floor(Math.random() * (this.d[p][1][1] - this.d[p][1][0] + 1)) + this.d[p][1][0],
-                xp: this.x,
-                yp: this.y,
-            });
-        }
-        this.destroy();
-    };
-    this.destroy = function () {
-        this.ch = false;
-        this.ac = undefined;
-        this.x = undefined;
-        this.y = undefined;
-        this.h = undefined;
-        this.t = undefined;
-        this.d = undefined;
-        this.ng = undefined;
-    };
-}
-function genMobs() {
-    for (var c = 0; c < 2000; c++) {
-        mobs.push(new mob('blob'));
-    }
-}
-function renMobs() {
-    for (var t = 0; t < mobs.length; t++) {
-        mobs[t].render();
-    }
-}
-function openMap() {
-    if (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109])) {
-        screenNum = 3;
-        myGameArea.keys[109] = false;
-        myGameArea.keys[77] = false;
-        mapview = [];
-        for (var x = 0; x < 10000; x++) {
-            var current = [];
-            for (var y = 0; y < 100; y++) {
-                current.push(map[10 * (x % 100) + y % 10 + (width * (10 * Math.floor(x / 100) + Math.floor(y / 10)))]);
-            }
-            var counter = [], counterIndex = [];
-            for (var k in current) {
-                if (counterIndex.includes(current[k])) {
-                    counter[counterIndex.indexOf(current[k])]++;
-                } else {
-                    counterIndex.push(current[k]);
-                    counter.push(1);
-                }
-            }
-            var bm = -Infinity, ind = 0;
-            for (var p in counter) {
-                if (counter[p] > bm) {
-                    bm = counter[p];
-                    ind = p;
-                }
-            }
-            mapview.push(counterIndex[ind]);
-        }
-    }
-}
-function renderMap() {
-    for (var x = 0; x < 10000; x++) {
-        myGameArea.context.fillStyle = mapview[x] == 'unknown' ? 'black' : (mapview[x] == 'desert' ? '#ffff99' : (mapview[x] == 'forest' ? 'green' : 'grey'));
-        myGameArea.context.fillRect((x % 100) * 7, Math.floor(x / 100) * 7, 7, 7);
-    }
-    myGameArea.context.fillStyle = 'red';
-    myGameArea.context.fillRect(xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
-}
-function closeMap() {
-    myGameArea.context.drawImage(ime, 56, 56, 56, 56, 650, 0, 50, 50);
-    if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109]))) {
+function renderDeath() {
+    myGameArea.context.fillStyle = 'maroon';
+    myGameArea.context.fillRect(0, 0, 700, 700);
+    myGameArea.context.font = '50px Arial';
+    myGameArea.context.fillStyle = 'white';
+    myGameArea.context.fillText('You died!', 250, 200);
+    myGameArea.context.fillStyle = '#555';
+    myGameArea.context.fillRect(300, 500, 100, 50);
+    myGameArea.context.font = '22px Arial';
+    myGameArea.context.fillStyle = 'white';
+    myGameArea.context.fillText('Respawn', 305, 530);
+    if (myGameArea.click && myGameArea.x > 300 && myGameArea.y > 500 && myGameArea.x < 400 && myGameArea.y < 550) {
         screenNum = 1;
-        myGameArea.keys[109] = false;
-        myGameArea.keys[77] = false;
-    }
-    document.getElementById("canvas").style.cursor = 'default';
-}
-function renderHoverCraft(k) {
-    if (!myGameArea.click && myGameArea.x < 610 && myGameArea.y > 250 && myGameArea.x > 50 && k[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)]) {
-        if (myGameArea.keys[16]) {
-            myGameArea.context.fillStyle = 'grey';
-            var bloc = k[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)][0][1];
-            var util = k[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)][0][2];
-            var vw = (util === 'none' ? 0 : 100) + (bloc.length * 70);
-            myGameArea.context.fillRect(myGameArea.x - vw / 2, myGameArea.y - 35, vw, 70);
-            myGameArea.context.fillStyle = 'white';
-            myGameArea.context.font = '25px Arial';
-            for (var k = 0; k < bloc.length; k++) {
-                myGameArea.context.drawImage(imt, 32 * chooseBlock(bloc[k][0])[0], 32 * chooseBlock(bloc[k][0])[1], 32, 32, myGameArea.x + (70 * k) + 3 - (vw / 2), myGameArea.y - 32, 64, 64);
-                myGameArea.context.fillText(bloc[k][1], myGameArea.x + (70 * k) + 40 - (vw / 2), myGameArea.y + 30);
-            }
-            if (util !== 'none') {
-                myGameArea.context.fillText('on', myGameArea.x + 70 * bloc.length - (vw / 2), myGameArea.y);
-                myGameArea.context.drawImage(imt, 32 * chooseBlock(util)[0], 32 * chooseBlock(util)[1], 32, 32, myGameArea.x + (70 * bloc.length) + 33 - (vw / 2), myGameArea.y - 32, 64, 64);
-            }
-        } else {
-            var h = k[(Math.floor((myGameArea.y - 250) / 56) * 10) + Math.floor((myGameArea.x - 50) / 56) + (pagenum * 70)][0][0][0];
-            var c = data.viewdata[h];
-            var k = [];
-            for (var m = 0; m < c.split('*').length; m++) {
-                k.push(c.split('*')[m].length);
-            }
-            myGameArea.context.fillStyle = 'grey';
-            myGameArea.context.fillRect(myGameArea.x - (6 * Math.max.apply(null, k)), myGameArea.y - (c.split('*').length * 20 / 2), (12 * Math.max.apply(null, k)), c.split('*').length * 20);
-            myGameArea.context.fillStyle = 'white';
-            myGameArea.context.font = '20px Arial';
-            for (var x = 0; x < c.split('*').length; x++) {
-                myGameArea.context.fillText(c.split('*')[x], myGameArea.x + (((12 * Math.max.apply(null, k)) - (12 * k[x])) / 2) - (6 * Math.max.apply(null, k)), myGameArea.y - (c.split('*').length * 20 / 2) + (20 * x) + 20);
-            }
-        }
-    }
-}
-function renderHoverItem() {
-    if (!myGameArea.click && myGameArea.x > 50 && myGameArea.x < 610 && myGameArea.y > 50 && myGameArea.y < 208 && inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0] != 'e') {
-        var h = inventory[Math.floor((myGameArea.x - 50) / 56) + 10 * Math.floor((myGameArea.y - 50) / 56)][0];
-        var c = data.viewdata[h];
-        var k = [];
-        for (var m = 0; m < c.split('*').length; m++) {
-            k.push(c.split('*')[m].length);
-        }
-        myGameArea.context.fillStyle = 'grey';
-        myGameArea.context.fillRect(myGameArea.x - (6 * Math.max.apply(null, k)), myGameArea.y - (c.split('*').length * 20 / 2), (12 * Math.max.apply(null, k)), c.split('*').length * 20);
-        myGameArea.context.fillStyle = 'white';
-        myGameArea.context.font = '20px Arial';
-        for (var x = 0; x < c.split('*').length; x++) {
-            myGameArea.context.fillText(c.split('*')[x], myGameArea.x + (((12 * Math.max.apply(null, k)) - (12 * k[x])) / 2) - (6 * Math.max.apply(null, k)), myGameArea.y - (c.split('*').length * 20 / 2) + (20 * x) + 20);
-        }
-    }
-}
-function renderPages() {
-    myGameArea.context.drawImage(imh, 256, 0, 32, 32, 619, 430, 32, 32);
-    myGameArea.context.drawImage(imh, 288, 0, 32, 32, 9, 430, 32, 32);
-    if (myGameArea.click && myGameArea.x > 619 && myGameArea.x < 651 && myGameArea.y > 430 && myGameArea.y < 462) {
-        pagenum = (pagenum == pages - 1 ? 0 : pagenum + 1);
-        myGameArea.click = false;
-    }
-    if (myGameArea.click && myGameArea.x > 9 && myGameArea.x < 41 && myGameArea.y > 430 && myGameArea.y < 462) {
-        pagenum = (pagenum == 0 ? pages - 1 : pagenum - 1);
-        myGameArea.click = false;
+        playerHealth = maxHealth;
     }
 }
