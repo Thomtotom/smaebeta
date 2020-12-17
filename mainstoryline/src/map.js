@@ -34,19 +34,27 @@ function renderMap() {
         myGameArea.context.fillStyle = mapview[x] == 'unknown' ? 'black' : (mapview[x] == 'desert' ? '#ffff99' : (mapview[x] == 'forest' ? 'green' : 'grey'));
         myGameArea.context.fillRect((x % 100) * 7, Math.floor(x / 100) * 7, 7, 7);
     }
-    myGameArea.context.fillStyle = 'cyan';
-    myGameArea.context.fillRect(deathX * 0.7 - 5, deathY * 0.7 - 5, 10, 10);
-    myGameArea.context.fillStyle = 'lime';
-    myGameArea.context.fillRect(spawnx * 0.7 - 5, spawny * 0.7 - 5, 10, 10);
     myGameArea.context.fillStyle = 'red';
     myGameArea.context.fillRect(xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
 }
 function closeMap() {
-    myGameArea.context.drawImage(ime, 56, 56, 56, 56, 650, 0, 50, 50);
+    myGameArea.context.drawImage(ime, 70, 70, 50, 50, 650, 0, 50, 50);
     if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109]))) {
         screenNum = 1;
         myGameArea.keys[109] = false;
         myGameArea.keys[77] = false;
     }
     document.getElementById("canvas").style.cursor = 'default';
+}
+function loadMap() {
+    for (var x = 0; x < 1000000; x++) {
+        map.push('unknown');
+    }
+}
+function updateMap() {
+    for (var x = 0; x < 1000000; x++) {
+        if (((((x % 1000) - xpos) ** 2) + ((Math.floor(x / 1000) - ypos) ** 2)) ** (1 / 2) <= 100) {
+            map[x] = biomes[x];
+        }
+    }
 }

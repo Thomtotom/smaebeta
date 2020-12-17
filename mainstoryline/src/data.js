@@ -1,4 +1,5 @@
-﻿var data = {
+﻿function loadData(){
+data = {
     maxClicks: {
         r: { def: 100, px: 50, ipx: 25 },
         t4: { def: 200, x: 100, ix: 50 },
@@ -9,9 +10,10 @@
         nvp: { def: 200, px: 100, ipx: 50 },
         db: { def: 50, x: 25, ix: 12 },
         lp: { def: 50, x: 25, ix: 12 },
+        ss: { def: 100, px: 50, ipx: 25},
     },
     ms: {
-        x: 1, px: 1, bx: 1, sw: 1, ix: 1, ipx: 1, ibx: 1, isw: 1,
+        x: 1, px: 1, bx: 1, sw: 1, ix: 1, ipx: 1, ibx: 1, isw: 1, ih: 1, ic: 1, il: 1, ib: 1, sb: 1, lpx: 1, fb: 1
     },
     dmg: {
         def: 2,
@@ -23,6 +25,8 @@
         isw: 9,
         ix: 8,
         ibx: 10,
+        fb: 10,
+        lpx: 5,
     },
     recipes: [
         [['p', 4], [['l', 1]], 'none'],
@@ -41,19 +45,23 @@
         [['ipx', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ix', 1], [['ii', 5], ['st', 10]], 'nvp'],
         [['ibx', 1], [['ii', 10], ['st', 10]], 'nvp'],
-    ],
+        [['ih', 1], [['ii', 5]], 'nvp'],
+        [['ic', 1], [['ii', 15]], 'nvp'],
+        [['il', 1], [['ii', 10]], 'nvp'],
+        [['ib', 1], [['ii', 5]], 'nvp'],
+    ],  
     dropitem: {
         r: { def: ['s', [1, 1]] },
         t4: { def: ['l', [4, 7]] },
         lp: { def: ['l', [1, 1]] },
         fb: { def: ['fb', [1, 1]] },
-        io: { def: ['', [0, 0]], px: ['io', [1, 1]], ipx: ['io', [1, 1]] },
-        co: { def: ['', [0, 0]], px: ['c', [1, 1]], ipx: ['c', [1, 1]] },
+        io: { def: ['', [0, 0]], px: ['io', [1, 1]], ipx: ['io', [1, 1]], lpx: ['ii', [1, 1] ] },
+        co: { def: ['', [0, 0]], px: ['c', [1, 1]], ipx: ['c', [1, 1]], lpx: ['c', [1, 1]] },
         f: { def: ['f', [1, 1]] },
         nvp: { def: ['nv', [1, 1]] },
         ch: { def: ['ch', [1, 1]] },
         db: { def: ['st', [1, 3]] },
-        lp: { def: ['l', [1, 1]] },
+        ss: {def: ['ss', [1, 1]]}
     },
     defaultTile: {
         forest: 'g',
@@ -65,6 +73,7 @@
         ['ch', 'ch'],
         ['nv', 'nvp'],
         ['l', 'lp'],
+        ['ss','ss']
     ],
     walkable: ['g', 'sr', 'ds', 'io', 'co', 'db'],
     blockimg: {
@@ -72,7 +81,7 @@
         cs: [1, 0],
         f: [2, 0],
         t: [3, 0],
-        exp: [4, 0],
+        fb: [4, 0],
         t4: [0, 1],
         r: [1, 1],
         sw: [2, 1],
@@ -84,7 +93,7 @@
         x: [3, 2],
         bx: [4, 2],
         lp: [0, 3],
-        fb: [1, 3],
+        lpx: [1, 3],
         ds: [2, 3],
         sr: [3, 3],
         io: [4, 3],
@@ -100,7 +109,35 @@
         nv: [4, 5],
         nvp: [0, 6],
         gl: [1, 6],
+        ih: [2, 6],
+        ic: [3, 6],
+        il: [4, 6],
+        ib: [0, 7],
+        sb: [1, 7],
+        dc: [2, 7],
+        ss: [3, 7],
     },
+    armor: {
+        h: ['ih','e'],
+        c: ['ic','e'],
+        l: ['il','e'],
+        b: ['ib','e','sb'],
+    },
+    armordef: {
+        ih: 1,
+        ic: 3,
+        il: 2,
+        ib: 1,
+        sb: 0,
+        e: 0,
+    },
+    armordraw: {
+        ih: { l: 24, r: 25, sl: 26, sr: 27, al: 28, ar: 29 },
+        ib: { l: 18, r: 19, sl: 20, sr: 21, al: 22, ar: 23 },
+        il: { l: 12, r: 13, sl: 14, sr: 15, al: 16, ar: 17 },
+        ic: { l: 6, r: 7, sl: 8, sr: 9, al: 10, ar: 11 },
+        sb: { l: 0, r: 1, sl: 2, sr: 3, al: 4, ar: 5 },
+    }, 
     spawnpatch: {
         io: [200, [5, 12]],
         co: [300, [5, 20]],
@@ -113,6 +150,7 @@
                 dl: 2,
                 dr: 3,
             },
+            dmg: 2,
             type: 'hostile',
             spawn: 'forest',
             speed: 0.02,
@@ -137,12 +175,31 @@
         io: 'Iron ore',
         c: 'Coal',
         ii: 'Iron ingot',
-        ch: 'Chest*Placable',
+        ch: 'Chest*Placable*Stores items',
         isw: 'Iron sword*+7 damage',
         ipx: 'Iron pickaxe*Mines even faster*+5 damage',
         ix: 'Iron axe*Cuts trees even faster*+6 damage',
         ibx: 'Iron battleaxe*+8 damage',
         nv: 'Anvil*Crafts iron tools',
-        gl: 'Gel'
-    }
+        gl: 'Gel',
+        ih: 'Iron helmet*Armor*+1 defense',
+        ic: 'Iron chestplate*Armor*+3 defense',
+        il: 'Iron leggings*Armor*+2 defense',
+        ib: 'Iron boots*Armor*+1 defense',
+        sb: 'Sandrunner boots*2x speed in desert',
+        lpx: 'Lava pickaxe*Mines incredibly slowly*Smelts iron automatically*+3 damage',
+        fb: 'Forest blade*+8 damage',
+        t4: 'Tree',
+        g: 'Grass',
+        r: 'Rock',
+        sr: 'Stone',
+        co: 'Coal ore',
+        ds: 'Sand',
+        db: 'Dead bush',
+        lp: 'Log',
+        ss: 'Sandstone*Placable',
+        dc: 'Crown of the desert*Summons the Sandcrawler',
+        nvp: 'Anvil'
+    },
 };
+}

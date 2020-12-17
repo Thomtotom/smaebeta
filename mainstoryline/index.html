@@ -17,13 +17,15 @@
         }
     </style>
 </head>
-<body onload="loadFile(['data.js', 'render.js', 'generate.js', 'inventory.js', 'motion.js', 'mob.js', 'map.js', 'inventoryrender.js'])">
-    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000;
+<body onload="startGame()">
+    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000, invPage = 0, openedWithChest = false, equipped = { h: ['e', ''], c: ['e',''],l: ['e',''],b: ['e','']}, chestContents = {}, cx = 0, cy = 0, gs = false, datashow = false, data;
         bImage.src = 'imgs/index wp.png';
         function startGame() {
+            loadData();
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
             }
+            gs = true;
             recipes = data.recipes;
             maxClicks = data.maxClicks;
             defaultTile = data.defaultTile;
@@ -33,7 +35,7 @@
             blockimg = data.blockimg;
             myGameArea.start();
             myGameArea.context.imageSmoothingEnabled = false;
-            for (var x = 0; x < 30; x++) {
+            for (var x = 0; x < 24; x++) {
                 inventory.push(['e', '']);
             }
         }
@@ -73,11 +75,12 @@
                         }
                     }
                     if (ex > 0) {
+                        var ng = Math.random() * Math.PI * 2;
                         dropblocs.push({
-                            xp: xpos,
-                            yp: ypos,
+                            xp: xpos + ((Math.random() ** (1/2)) * 1) * Math.cos(ng),
+                            yp: ypos + ((Math.random() ** (1/2)) * 1) * Math.sin(ng),
                             item: c,
-                            num: ex
+                            num: ex,
                         });
                     }
                 } else if (n < 0) {
@@ -146,18 +149,6 @@
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             }
         };
-        function loadFile(src) {
-            for (var q = 0; q < src.length; q++) {
-                var script = document.createElement('SCRIPT');
-                script.src = 'src/' + src[q];
-                document.body.appendChild(script);
-                if (q == src.length - 1) {
-                    script.onload = () => {
-                        startGame();
-                    }
-                }
-            }
-        }
         function updateGameArea() {
             myGameArea.clear();
             if (screenNum == 0) {
@@ -180,7 +171,7 @@
                 renderBlocks();
                 interact();
                 renderDrops();
-                renderPlayer(move());
+                renderPlayerArmor(renderPlayer(move()));
                 renMobs();
                 renderHotbar();
                 renderHealth();
@@ -188,10 +179,13 @@
                 updateMap();
                 openMap();
                 throwItems();
+                renderData();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
                     myGameArea.keys[69] = false;
+                    openedWithChest = false;
+                    invPage = 0;
                 }
             } else if (screenNum == 2) {
                 myGameArea.context.fillStyle = '#000066';
@@ -202,8 +196,16 @@
                 renderTrash();
                 renderHoverItem();
                 dealWithSwaps();
-                renderPages();
-                renderHoverCraft(dealWithCrafts(renderRecipes()));
+                if (invPage == 0) {
+                    renderPages();
+                    renderHoverCraft(dealWithCrafts(renderRecipes()));
+                } else if (invPage == 1) {
+                    renderArmor();
+                } else if(invPage == 2){
+                    renderChestContents();
+                    renderHoverChest();
+                }
+                renderTabs();
             } else if (screenNum == 3) {
                 renderMap();
                 closeMap();
@@ -212,6 +214,15 @@
             }
         }
     </script>
+    <script src='src/mob.js'></script>
+    <script src='src/data.js'></script>
+    <script src='src/generate.js'></script>
+    <script src='src/inventory.js'></script>
+    <script src='src/inventoryrender.js'></script>
+    <script src='src/map.js'></script>
+    <script src='src/motion.js'></script>
+    <script src='src/render.js'></script>
+
     <canvas id="canvas"></canvas>
 </body>
 </html>

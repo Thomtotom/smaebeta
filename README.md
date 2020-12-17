@@ -6,14 +6,14 @@ https://smae.surge.sh
 - [ ] Better art for:
   * Gel / torch items
   * Block cracking
-- [ ] Figure out food
+- [x] Figure out food
   * Whether to use
   * If used, how to eat, starvation rate, how to get.
   * If not used, how to regain health.
 - [x] Art for health/food (see prev)
-- [ ] Chests
+- [x] Chests
 - [x] Health (see figure out food)
-- [ ] Temples (do once chests figured out)
+- [x] Temples (do once chests figured out)
 - [ ] Ingame Documentation - Decide how to do manual - Book item? Can we make it automatic?
 - [ ] How to play (Ingame) - Text based or image? Control manipulation? 
 - [ ] Achievements?
@@ -44,6 +44,7 @@ https://smae.surge.sh
 - Map: M
 - Attack / Place / Mine: Space
 - Select item in hotbar: 1 to 7
+- Toggle data: F
 ### In inventory:
 - See data: hover over item
 - Swap items: Select one, then click on the other.
@@ -51,3 +52,4 @@ https://smae.surge.sh
 - Split: Select the stack you want to split, then shift+click on an empty cell.
 - Delete: Select the item you want to delete, then click on the trashcan.
 - See recipe: shift+hover over item in crafting list.
+- Switch between crafting, armor and chest: Click on the tabs on the right. 

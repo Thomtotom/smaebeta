@@ -13,10 +13,11 @@
     this.fc = 0;
     this.fi = 0;
     this.l = data.mobs[name].cycleLoop;
+    this.dmg = data.mobs[name].dmg;
     this.render = function () {
         if (this.ch) {
             this.move();
-            if ((this.x - xpos + 3) * 100 < 850 && (this.y - ypos + 3) * 100 < 850 && (this.x - xpos + 3) * 100 > -150 && (this.y - ypos + 3) * 100 > -150) {
+            if ((this.x - xpos + (3 + 14/96)) * 96 < 850 && (this.y - ypos + (3 + 14/96)) * 96 < 850 && (this.x - xpos + (3 + 14/96)) * 96 > -150 && (this.y - ypos + (3 + 14/96)) * 96 > -150) {
                 this.fc++;
                 if (this.fc == data.mobs[name].framerate) {
                     this.fc = 0;
@@ -28,15 +29,15 @@
                 if (this.dmgc > 0) {
                     this.dmgc--;
                     if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dr'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dr'], 32, 32, (this.x - xpos + (3 + 14/96)) * 96, (this.y - ypos + (3 + 14/96)) * 96, 96, 96);
                     } else {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dl'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100);
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['dl'], 32, 32, (this.x - xpos + (3 + 14/96)) * 96, (this.y - ypos + (3 + 14/96)) * 96, 96, 96);
                     }
                 } else {
                     if (this.ng > Math.PI * 3 / 2 || this.ng < Math.PI / 2) {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['r'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['r'], 32, 32, (this.x - xpos + (3 + 14/96)) * 96, (this.y - ypos + (3 + 14/96)) * 96, 96, 96)
                     } else {
-                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['l'], 32, 32, (this.x - xpos + 3) * 100, (this.y - ypos + 3) * 100, 100, 100)
+                        myGameArea.context.drawImage(imm, 32 * this.l[this.fi], 32 * data.mobs[name].get['l'], 32, 32, (this.x - xpos + (3 + 14/96)) * 96, (this.y - ypos + (3 + 14/96)) * 96, 96, 96)
                     }
                 }
             }
@@ -90,11 +91,12 @@
     this.s = data.mobs[name].speed;
     this.die = function () {
         for (p in this.d) {
+            var ng = Math.random() * Math.PI * 2;
             dropblocs.push({
                 item: this.d[p][0],
                 num: Math.floor(Math.random() * (this.d[p][1][1] - this.d[p][1][0] + 1)) + this.d[p][1][0],
-                xp: this.x,
-                yp: this.y,
+                xp: this.x + ((Math.random() ** (1/2)) * 2) * Math.cos(ng),
+                yp: this.y + ((Math.random() ** (1/2)) * 2) * Math.sin(ng),
             });
         }
         this.destroy();

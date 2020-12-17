@@ -9,11 +9,74 @@ var imm = new Image();
 imm.src = 'imgs/mobnew.png';
 var imh = new Image();
 imh.src = 'imgs/system-32.png';
-function renderHealth() {
-    for (var x = 0; x < playerHealth; x++) {
-        myGameArea.context.drawImage(imh, (playerHealth % 2 == 1 && x == playerHealth - 1 ? 96 :(x % 2 >= 1 ? 64 : 32)), 0, 32, 32, 6 + 16 * (x % 20), 568 - 32 * Math.floor(x / 20), 32, 32);
+var ima = new Image();
+ima.src = 'imgs/armor.png';
+function renderData(){
+    if(myGameArea.keys && (myGameArea.keys[102] || myGameArea.keys[70])){
+        if(datashow){
+            datashow = false;
+        } else {
+            datashow = true;
+        }
+        myGameArea.keys[102] = false;
+        myGameArea.keys[70] = false;
     }
-    for (var x = playerHealth; x < maxHealth; x++) {
+    if(datashow){
+        myGameArea.context.globalAlpha = 0.4;
+        myGameArea.context.fillStyle = 'black';
+        myGameArea.context.fillRect(0,0,700,200);
+        myGameArea.context.globalAlpha = 1;
+        myGameArea.context.fillStyle = 'white';
+        myGameArea.context.font = '20px Arial';
+        myGameArea.context.fillText('X: ' + xpos,10,30);
+        myGameArea.context.fillText('Y: ' + ypos,10,60);
+        myGameArea.context.fillText('Current biome: ' + biomes[Math.floor(ypos) * width + Math.floor(xpos)],10,90);
+        myGameArea.context.fillText('Standing on: ' + data.viewdata[blocks[Math.floor(ypos)][Math.floor(xpos)]].split('*')[0],10,150);
+        myGameArea.context.fillText('Looking at: ' + data.viewdata[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]].split('*')[0],10,120);
+    }
+}
+function renderPlayerArmor(moved) {
+    var charRow;
+    if (currentDirection == 1) {
+        if (myGameArea.keys && myGameArea.keys[32]) {
+            charRow = 'ar';
+        } else if (moved) {
+            charRow = 'r';
+        } else {
+            charRow = 'sr';
+        }
+    } else {
+        if (myGameArea.keys && myGameArea.keys[32]) {
+            charRow = 'al';
+        } else if (moved) {
+            charRow = 'l';
+        } else {
+            charRow = 'sl';
+        }
+    }
+    if (data.armordraw[equipped.h[0]]) {
+        myGameArea.context.drawImage(ima, CYCLE_LOOP[currentLoopIndex] * 32, data.armordraw[equipped.h[0]][charRow] * 32, 32, 32, 302, 302, 96, 96);
+    }
+    if (data.armordraw[equipped.b[0]]) {
+        myGameArea.context.drawImage(ima, CYCLE_LOOP[currentLoopIndex] * 32, data.armordraw[equipped.b[0]][charRow] * 32, 32, 32, 302, 302, 96, 96);
+    }
+    if (data.armordraw[equipped.l[0]]) {
+        myGameArea.context.drawImage(ima, CYCLE_LOOP[currentLoopIndex] * 32, data.armordraw[equipped.l[0]][charRow] * 32, 32, 32, 302, 302, 96, 96);
+    }
+    if (data.armordraw[equipped.c[0]]) {
+        myGameArea.context.drawImage(ima, CYCLE_LOOP[currentLoopIndex] * 32, data.armordraw[equipped.c[0]][charRow] * 32, 32, 32, 302, 302, 96, 96);
+    }
+    if(equipped.b[0] === 'sb' && biomes[Math.floor(ypos) * width + Math.floor(xpos)] == 'desert'){
+        speed = 0.125;
+    } else {
+        speed = 0.0625;
+    }
+}
+function renderHealth() {
+    for (var x = 0; x < Math.ceil(playerHealth); x++) {
+        myGameArea.context.drawImage(imh, (Math.ceil(playerHealth) % 2 == 1 && x == Math.ceil(playerHealth) - 1 ? 96 :(x % 2 >= 1 ? 64 : 32)), 0, 32, 32, 6 + 16 * (x % 20), 568 - 32 * Math.floor(x / 20), 32, 32);
+    }
+    for (var x = Math.ceil(playerHealth); x < maxHealth; x++) {
         myGameArea.context.drawImage(imh, (maxHealth % 2 == 1 && x == maxHealth - 1 ? 192 : (x % 2 >= 1 ? 160 : 128)), 0, 32, 32, 6 + 16 * (x % 20), 568 - 32 * Math.floor(x / 20), 32, 32);
     }
     if (playerHealth < maxHealth) {
@@ -21,18 +84,32 @@ function renderHealth() {
         if (regenCount == 50) {
             regenCount = 0;
             playerHealth++;
+            if (playerHealth > maxHealth) {
+                playerHealth = maxHealth;
+            }
         }
     }
     if (playerHealth <= 0) {
         screenNum = 4;
         for (var o = 0; o < inventory.length; o++) {
+            var ng = Math.random() * Math.PI * 2;
             dropblocs.push({
-                xp: xpos,
-                yp: ypos,
+                xp: xpos + ((Math.random() ** (1/2)) * 3) * Math.cos(ng),
+                yp: ypos + ((Math.random() ** (1/2)) * 3) * Math.sin(ng),
                 item: inventory[o][0],
                 num: inventory[o][1],
             });
             inventory[o] = ['e', ''];
+        }
+        for (var k in equipped) {
+            var ng = Math.random() * Math.PI * 2;
+            dropblocs.push({
+                xp: xpos + ((Math.random() ** (1/2)) * 3) * Math.cos(ng),
+                yp: ypos + ((Math.random() ** (1/2)) * 3) * Math.sin(ng),
+                item: equipped[k][0],
+                num: equipped[k][1],
+            });
+            equipped[k] = ['e','']
         }
         deathX = xpos;
         deathY = ypos;
@@ -44,7 +121,7 @@ function renderDrops() {
     for (var b = 0; b < dropblocs.length; b++) {
         var dq = chooseBlock(dropblocs[b].item);
         if (dropblocs[b].num > 0) {
-            myGameArea.context.drawImage(imt, dq[0] * 32, dq[1] * 32, 32, 32, (dropblocs[b].xp - xpos + 3.3) * 100, (dropblocs[b].yp - ypos + 3.3) * 100, 40, 40);
+            myGameArea.context.drawImage(imt, dq[0] * 32, dq[1] * 32, 32, 32, (dropblocs[b].xp - xpos + (3.34 + 14/96)) * 96, (dropblocs[b].yp - ypos + (3.34 + 14/96)) * 96, 32, 32);
             var k = 0;
             for (var x = 0; x < inventory.length; x++) {
                 if (inventory[x][1] == '' || (inventory[x][0] == dropblocs[b].item && inventory[x][1] < (data.ms[dropblocs[b].item] ?? 64))) {
@@ -61,11 +138,11 @@ function renderDrops() {
 }
 function renderBlocks() {
     var ctx = myGameArea.context;
-    for (var r = Math.floor(ypos) - 5; r < Math.floor(ypos) + 5; r++) {
-        for (var c = Math.floor(xpos) - 5; c < Math.floor(xpos) + 5; c++) {
+    for (var r = Math.floor(ypos) - 6; r < Math.floor(ypos) + 6; r++) {
+        for (var c = Math.floor(xpos) - 6; c < Math.floor(xpos) + 6; c++) {
             if (r > 0 && c > 0 && r < 1000 && c < 1000) {
                 var d = chooseBlock(blocks[r][c]);
-                ctx.drawImage(imt, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + 3) * 100, (r - ypos + 3) * 100, 100, 100);
+                ctx.drawImage(imt, d[0] * 32, d[1] * 32, 32, 32, (c - xpos + (3 + 14/96)) * 96, (r - ypos + (3 + 14/96)) * 96, 96, 96);
             }
         }
     }
@@ -92,25 +169,25 @@ function renderPlayer(moved) {
     for (var x = 0; x < mobs.length; x++) {
         if ((((mobs[x].x - xpos) ** 2) + ((mobs[x].y - ypos) ** 2)) ** (1 / 2) < 1 / 2 && dmgcount == 0) {
             dmgcount = 12;
-            playerHealth--;
+            playerHealth -= mobs[x].dmg * (1 / (1 + ((data.armordef[equipped.h[0]] + data.armordef[equipped.c[0]] + data.armordef[equipped.b[0]] + data.armordef[equipped.l[0]]) / 10)));
         }
     }
     if (dmgcount > 0) {
         dmgcount--;
     }
-    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection + (myGameArea.keys[32] ? 4 : (moved ? 0 : 2)) + (dmgcount > 0 ? 6 : 0), 300, 300);
+    drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection + (myGameArea.keys[32] ? 4 : (moved ? 0 : 2)) + (dmgcount > 0 ? 6 : 0), 302, 302);
+    return moved;
 }
 function renderHotbar() {
     for (var w = 0; w < 7; w++) {
-        myGameArea.context.fillStyle = (w == selectIndex ? 'gold' : 'grey');
-        myGameArea.context.drawImage(ime, w == selectIndex ? 112 : 0,0,56,56,70 + (80 * w), 600, 80, 80);
+        myGameArea.context.drawImage(ime, w == selectIndex ? 140 : 0, 0, 70, 70, 105 + (70 * w), 600, 70, 70);
         if (inventory[w]) {
             var gx = chooseBlock(inventory[w][0])[0] * 32, gy = chooseBlock(inventory[w][0])[1] * 32;
-            myGameArea.context.drawImage(imt, gx, gy, 32, 32, 75 + (80 * w), 605, 70, 70);
+            myGameArea.context.drawImage(imt, gx, gy, 32, 32, 108 + (70 * w), 603, 64, 64);
             if (inventory[w][1] > 1) {
                 myGameArea.context.font = '20px Arial';
                 myGameArea.context.fillStyle = 'white';
-                myGameArea.context.fillText(inventory[w][1], 105 + w * 80, 675);
+                myGameArea.context.fillText(inventory[w][1], 145 + w * 70, 665);
             }
         }
     }

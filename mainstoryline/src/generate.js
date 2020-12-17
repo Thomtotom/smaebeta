@@ -13,10 +13,32 @@
                 cy = Math.floor(Math.random() * 994) + 3;
             } 
             for (var n = 0; n < loop; n++) {
-                if (biomes[cy + Math.floor(n / Math.floor(loop ** (1 / 2))) * width + cx + (n % Math.floor(loop ** (1 / 2)))] == 'mountain' && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) > 2 && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) < 997 && cx + (n % Math.floor(loop ** (1 / 2))) > 2 && cx + (n % Math.floor(loop ** (1 / 2))) < 997) {
+                if (biomes[(cy + Math.floor(n / Math.floor(loop ** (1 / 2)))) * width + cx + (n % Math.floor(loop ** (1 / 2)))] == 'mountain' && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) > 2 && cy + Math.floor(n / Math.floor(loop ** (1 / 2))) < 997 && cx + (n % Math.floor(loop ** (1 / 2))) > 2 && cx + (n % Math.floor(loop ** (1 / 2))) < 997) {
                     blocks[cy + Math.floor((n / Math.floor(loop ** (1 / 2))))][cx + (n % Math.floor(loop ** (1 / 2)))] = String(p);
                 }
             }
+        }
+    }
+    for(var k = 0; k < 50; k++){
+        var tx = Math.floor(Math.random() * 987) + 3, ty = Math.floor(Math.random() * 987) + 3;
+        while (biomes[tx + width * ty] != 'desert') {
+            tx = Math.floor(Math.random() * 987) + 3;
+            ty = Math.floor(Math.random() * 987) + 3;
+        }
+        for(var q = 0; q < 49; q++){
+            if(q % 7 == 0 || q % 7 == 6 || Math.floor(q / 7) == 0 || Math.floor(q / 7) == 6 && (q != 21)){
+                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ss';
+            } else if(q == 26){
+                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ch';
+                chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = [];
+                for(var w = 0; w < 23; w++){
+                    chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push([Math.random() < 0.3 ? 'e' : (Math.random() < 0.7 ? (Math.random() < 0.7 ? 'st': 'c') : (Math.random() < 0.8 ? 'ii' : 'sb')),1]);
+                }
+                chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push(['dc',1]);
+            } else {
+                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ds';
+            }
+            biomes[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = 'desert';
         }
     }
     genMobs();
