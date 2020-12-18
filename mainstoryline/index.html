@@ -18,14 +18,13 @@
     </style>
 </head>
 <body onload="startGame()">
-    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000, invPage = 0, openedWithChest = false, equipped = { h: ['e', ''], c: ['e',''],l: ['e',''],b: ['e','']}, chestContents = {}, cx = 0, cy = 0, gs = false, datashow = false, data;
+    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000, invPage = 0, openedWithChest = false, equipped = { h: ['e', ''], c: ['e',''],l: ['e',''],b: ['e','']}, chestContents = {}, cx = 0, cy = 0, datashow = false, data;
         bImage.src = 'imgs/index wp.png';
         function startGame() {
             loadData();
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
             }
-            gs = true;
             recipes = data.recipes;
             maxClicks = data.maxClicks;
             defaultTile = data.defaultTile;
@@ -41,12 +40,6 @@
         }
         var myGameArea = {
             keys: [],
-            getc: function () {
-                return blocks[Math.floor(ypos + this.y / 100 - 3)][Math.floor(xpos + this.x / 100 - 3)];
-            },
-            setc: function (e) {
-                blocks[Math.floor(ypos + myGameArea.y / 100 - 3)][Math.floor(xpos + myGameArea.x / 100 - 3)] = e;
-            },
             add: function (c, n) {
                 if (n > 0) {
                     var ex = 0;
@@ -152,20 +145,7 @@
         function updateGameArea() {
             myGameArea.clear();
             if (screenNum == 0) {
-                myGameArea.context.drawImage(bImage, 0, 0, 700, 700);
-                if (myGameArea.x && myGameArea.y && myGameArea.x > 286 && myGameArea.y > 286 && myGameArea.x < 413 && myGameArea.y < 413 && myGameArea.click) {
-                    loadTiles();
-                    spawnx = Math.floor(Math.random() * 990) + 5;
-                    spawny = Math.floor(Math.random() * 990) + 5;
-                    while (blocks[spawny][spawnx] != 'g') {
-                        spawnx = Math.floor(Math.random() * 990) + 5;
-                        spawny = Math.floor(Math.random() * 990) + 5;
-                    }
-                    xpos = spawnx;
-                    ypos = spawny;
-                    loadMap();
-                    screenNum = 1;
-                }
+                renderTitleScreen();
             } else if (screenNum == 1) {
                 clearBlanks();
                 renderBlocks();
@@ -205,6 +185,7 @@
                     renderChestContents();
                     renderHoverChest();
                 }
+                renderSave();
                 renderTabs();
             } else if (screenNum == 3) {
                 renderMap();
@@ -222,7 +203,9 @@
     <script src='src/map.js'></script>
     <script src='src/motion.js'></script>
     <script src='src/render.js'></script>
-
     <canvas id="canvas"></canvas>
+    <a id='dwnld' hidden download="world.txt"></a>
+    <button  onclick='document.getElementById("file").click()' id='upload' hidden>Upload</button>
+    <input type='file' id='file'  hidden onchange='readFile(event)'/>
 </body>
 </html>

@@ -28,11 +28,11 @@ function interact() {
                     mobs[o].dmgc = 12;
                     mobs[o].h -= (data.dmg[inventory[selectIndex][0]] ?? data.dmg['def']);
                     if (mobs[o].h <= 0) {
-                        mobs[o].die();
+                        dieMob(mobs[o]);
                     } else {
                         for (var p = 0; p < 100; p++) {
-                            mobs[o].dx((-2 * Math.cos(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100);
-                            mobs[o].dy((-2 * Math.sin(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100);
+                            dxMob((-2 * Math.cos(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
+                            dyMob((-2 * Math.sin(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
                         }
                     }
                 }
