@@ -203,9 +203,10 @@
     <script src='src/map.js'></script>
     <script src='src/motion.js'></script>
     <script src='src/render.js'></script>
+    <script src='src/save.js'></script>
     <canvas id="canvas"></canvas>
     <a id='dwnld' hidden download="world.txt"></a>
-    <button  onclick='document.getElementById("file").click()' id='upload' hidden>Upload</button>
-    <input type='file' id='file'  hidden onchange='readFile(event)'/>
+    <button style='width: 500px; height: 100px; font-size: 60px' onclick='document.getElementById("file").click()' id='upload' hidden>Upload</button>
+    <input type='file' id='file'  hidden onchange='readFile(event)' accept="text/plain"/>
 </body>
 </html>
