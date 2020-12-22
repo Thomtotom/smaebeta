@@ -1,6 +1,7 @@
 ﻿function renderSave(){
     myGameArea.context.drawImage(ime, 70, 210, 50, 50, 0, 0, 50, 50);
     if(myGameArea.click && myGameArea.x > 0 && myGameArea.x < 50 && myGameArea.y > 0 && myGameArea.y < 50){
+        console.log(mobs);
         var sk = localStorage.getItem('secretKey') ?? Math.floor(Math.random() * 1000000000000);
         localStorage.setItem('secretKey',sk);
         var blk = [];
@@ -8,7 +9,10 @@
             blk.push(compressArr(q));
         }
         blk = blk.join('&');
-        var mobcl = mobs;
+        var mobcl = [];
+        for(var x of mobs){
+            mobcl.push(x);
+        }
         for(var k in mobcl){
             mobcl[k].x = Math.floor(mobcl[k].x * 10) / 10;
             mobcl[k].y = Math.floor(mobcl[k].y * 10) / 10;
@@ -51,7 +55,7 @@
             spawnx: spawnx,
             spawny: spawny,
             equipped: equipped,
-            mobs: mobs,
+            mobos: mobcl,
             playerHealth: playerHealth,
             maxHealth: maxHealth,
             inventory: inventory,
@@ -60,6 +64,53 @@
         alert("Put this somewhere safe");
         myGameArea.click = false;
         document.getElementById('dwnld').click();
+        var text = obj;
+        var blok = [];
+            text.blocks = text.blocks.split('&');
+            for(var q of text.blocks){
+                blok.push(expandArr(q));
+            }
+            var mobcl = text.mobos;
+            for(var k = mobcl.length - 1; k >= 0; k--){
+                if(mobcl[k].name === undefined){
+                    mobcl[k].name = mobcl[k + 1].name;
+                }
+                if(mobcl[k].ac === undefined){
+                    mobcl[k].ac = mobcl[k + 1].ac;
+                }
+                if(mobcl[k].fc === undefined){
+                    mobcl[k].fc = mobcl[k + 1].fc;
+                }
+                if(mobcl[k].h === undefined){
+                    mobcl[k].h = mobcl[k + 1].h;
+                }
+                if(mobcl[k].fi === undefined){
+                    mobcl[k].fi = mobcl[k + 1].fi;
+                }
+                if(mobcl[k].ch === undefined){
+                    mobcl[k].ch = mobcl[k + 1].ch;
+                }
+                if(mobcl[k].dmgc === undefined){
+                    mobcl[k].dmgc = mobcl[k + 1].dmgc;
+                }
+                blocks = blok;
+            }
+            inventory = text.inventory;
+            biomes = expandVals(expandArr(text.biomes));
+            xpos = text.xpos;
+            ypos = text.ypos;
+            chestContents = text.chestContents;
+            map = expandVals(expandArr(text.map));
+            mapview = expandVals(expandArr(text.mapview));
+            deathX = text.deathX;
+            deathY = text.deathY;
+            spawnx = text.spawnx;
+            spawny = text.spawny;
+            equipped = text.equipped;
+            mobs = mobcl;
+            playerHealth = text.playerHealth;
+            maxHealth = text.maxHealth;
+            screenNum = 1;
     }
 }
 function readFile(event){
@@ -76,7 +127,7 @@ function readFile(event){
             for(var q of text.blocks){
                 blok.push(expandArr(q));
             }
-            var mobcl = text.mobs;
+            var mobcl = text.mobos;
             for(var k = mobcl.length - 1; k >= 0; k--){
                 if(mobcl[k].name === undefined){
                     mobcl[k].name = mobcl[k + 1].name;
@@ -132,7 +183,7 @@ function compressArr(arr){
             }
             res += ci + cnm;    
         	ci = x;
-            cnm = 1;
+            cnm = 1; 
         } else {
         	cnm++;
         }
