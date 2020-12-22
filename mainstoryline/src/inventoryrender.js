@@ -333,14 +333,20 @@ function renderChestContents(){
                     chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1] = a;
                 } else {
                     if(inventory[invIndex][0] == chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][0]){
-                        var q = Math.min(inventory[invIndex][1], (data.ms[chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][0]] ?? 64) - chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1]);
-                        if (q == 0) {
-                            var h = inventory[invIndex][invIndex - 100];
+                        if(chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1] == (data.ms[inventory[invIndex][0]] ?? 64)){
+                            var h = inventory[invIndex];
                             inventory[invIndex] = chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))];
                             chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))] = h;
                         } else {
-                            inventory[invIndex][1] -= q;
-                            chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1] += q;
+                            var q = Math.min(inventory[invIndex][1], (data.ms[chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][0]] ?? 64) - chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1]);
+                            if (q == 0) {
+                                var h = inventory[invIndex][invIndex - 100];
+                                inventory[invIndex] = chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70)  + Math.floor((myGameArea.x - 50) / 70))];
+                            chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))] = h;
+                            } else {
+                                inventory[invIndex][1] -= q;
+                                chestContents[cy * 1000 + cx][(8 * Math.floor((myGameArea.y - 250) / 70) + Math.floor((myGameArea.x - 50) / 70))][1] += q;
+                            }
                         }
                     } else {
                         var h = inventory[invIndex];

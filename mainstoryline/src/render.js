@@ -11,6 +11,26 @@ var imh = new Image();
 imh.src = 'imgs/system-32.png';
 var ima = new Image();
 ima.src = 'imgs/armor.png';
+function renderInHand(){
+    if(myGameArea.keys[32]){
+        var os = -1;
+        if(currentDirection == 1){
+            var ng = (currentLoopIndex * 6 + frameCount + os) >= 15 ? (Math.PI) - Math.PI * (currentLoopIndex * 6 + frameCount + os) / 30 : Math.PI * (currentLoopIndex * 6 + frameCount + os) / 30;
+            myGameArea.context.save();
+            myGameArea.context.translate(350 + 20 * Math.cos(ng),350 + 20 * Math.sin(ng));
+            myGameArea.context.rotate(ng);
+            myGameArea.context.drawImage(imt,32 * chooseBlock(inventory[selectIndex][0])[0],32 * chooseBlock(inventory[selectIndex][0])[1],32,32,0, -64, 64, 64);
+            myGameArea.context.restore();
+        } else {
+            var ng = (currentLoopIndex * 6 + frameCount + os) >= 15 ? (Math.PI / 2) + Math.PI * (currentLoopIndex * 6 + frameCount + os) / 30 : (Math.PI / -2) +  Math.PI * (currentLoopIndex * 6 + frameCount + os) / -30;
+            myGameArea.context.save();
+            myGameArea.context.translate(350 + 20 * Math.cos(ng),370 + 20 * Math.sin(ng));
+            myGameArea.context.rotate(ng);
+            myGameArea.context.drawImage(imt,32 * chooseBlock(inventory[selectIndex][0])[0],32 * chooseBlock(inventory[selectIndex][0])[1],32,32,0, -64, 64, 64);
+            myGameArea.context.restore();
+        }
+    }
+}
 function renderData(){
     if(myGameArea.keys && (myGameArea.keys[102] || myGameArea.keys[70])){
         if(datashow){
@@ -30,9 +50,9 @@ function renderData(){
         myGameArea.context.font = '20px Arial';
         myGameArea.context.fillText('X: ' + xpos,10,30);
         myGameArea.context.fillText('Y: ' + ypos,10,60);
-        myGameArea.context.fillText('Current biome: ' + biomes[Math.floor(ypos) * width + Math.floor(xpos)],10,90);
-        myGameArea.context.fillText('Standing on: ' + data.viewdata[blocks[Math.floor(ypos)][Math.floor(xpos)]].split('*')[0],10,150);
-        myGameArea.context.fillText('Looking at: ' + data.viewdata[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]].split('*')[0],10,120);
+        myGameArea.context.fillText('Current biome: ' + (biomes[Math.round(ypos) * width + Math.round(xpos)][0].toUpperCase() + biomes[Math.round(ypos) * width + Math.round(xpos)].slice(1)),10,90);
+        myGameArea.context.fillText('Standing on: ' + data.viewdata[blocks[Math.round(ypos)][Math.round(xpos)]].split('*')[0],10,150);
+        myGameArea.context.fillText('Looking at: ' + (data.viewdata[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]] ?? 'Void').split('*')[0],10,120);
     }
 }
 function renderPlayerArmor(moved) {
@@ -66,7 +86,7 @@ function renderPlayerArmor(moved) {
     if (data.armordraw[equipped.c[0]]) {
         myGameArea.context.drawImage(ima, CYCLE_LOOP[currentLoopIndex] * 32, data.armordraw[equipped.c[0]][charRow] * 32, 32, 32, 302, 302, 96, 96);
     }
-    if(equipped.b[0] === 'sb' && biomes[Math.floor(ypos) * width + Math.floor(xpos)] == 'desert'){
+    if(equipped.b[0] === 'sb' && biomes[Math.round(ypos) * width + Math.round(xpos)] == 'desert'){
         speed = 0.125;
         xpos = xpos - (xpos % 0.125);
         ypos = ypos - (ypos % 0.125);
@@ -171,7 +191,7 @@ function renderPlayer(moved) {
     for (var x = 0; x < mobs.length; x++) {
         if ((((mobs[x].x - xpos) ** 2) + ((mobs[x].y - ypos) ** 2)) ** (1 / 2) < 1 / 2 && dmgcount == 0) {
             dmgcount = 12;
-            playerHealth -= mobs[x].dmg * (1 / (1 + ((data.armordef[equipped.h[0]] + data.armordef[equipped.c[0]] + data.armordef[equipped.b[0]] + data.armordef[equipped.l[0]]) / 10)));
+            playerHealth -= data.mobs[mobs[x].name].dmg * (1 / (1 + ((data.armordef[equipped.h[0]] + data.armordef[equipped.c[0]] + data.armordef[equipped.b[0]] + data.armordef[equipped.l[0]]) / 10)));
         }
     }
     if (dmgcount > 0) {
@@ -249,7 +269,7 @@ function renderTitleScreen(){
     myGameArea.context.fillText('New game',260,300);
     myGameArea.context.fillText('Load game',260,400);
     if (myGameArea.x > 250 && myGameArea.y > 250 && myGameArea.x < 450 && myGameArea.y < 325 && myGameArea.click) {
-        loadTiles();
+        loadTiles(Math.floor(Math.random() * 1000000000));
         spawnx = Math.floor(Math.random() * 990) + 5;
         spawny = Math.floor(Math.random() * 990) + 5;
         while (blocks[spawny][spawnx] != 'g') {
@@ -265,5 +285,29 @@ function renderTitleScreen(){
         document.getElementById('upload').hidden = false;
         document.getElementById('canvas').hidden = true;
         myGameArea.click = false;
+    }
+}
+function standingOn(x){
+    if(blocks[Math.floor(ypos)][Math.ceil(xpos)] == x){
+        return [Math.floor(ypos),Math.ceil(xpos)];
+    } 
+    if(blocks[Math.ceil(ypos)][Math.ceil(xpos)] == x){
+        return [Math.ceil(ypos),Math.ceil(xpos)];
+    }
+    if(blocks[Math.floor(ypos)][Math.floor(xpos)] == x){
+        return [Math.floor(ypos),Math.floor(xpos)];
+    }
+    if(blocks[Math.ceil(ypos)][Math.floor(xpos)] == x){
+        return [Math.ceil(ypos),Math.floor(xpos)];
+    }
+    return false;
+}
+function getTrapped(){
+    for(var c in data.traps){
+        if(standingOn(c)){
+            dmgcount = 12;
+            playerHealth -= data.traps[c] * (1 / (1 + ((data.armordef[equipped.h[0]] + data.armordef[equipped.c[0]] + data.armordef[equipped.b[0]] + data.armordef[equipped.l[0]]) / 10)));
+            blocks[standingOn(c)[0]][standingOn(c)[1]] = data.defaultTile[biomes[standingOn(c)[0] * width + standingOn(c)[1]]];
+        }
     }
 }

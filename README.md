@@ -30,7 +30,10 @@ https://smae.surge.sh
   - Natural structures
   - Endgame - Story?
 - [ ] Deploy app - Electron? :electron:
-- [ ] Some sort of save feature - see Electron and figure something out.
+- [ ] Save feature: 
+    - [x] Method of saving with hundredfold compression - 25 Mb of data to 250 Kb of text.
+    - [x] Download / load file (temporary). Note - keep this for online version - Play online / download game. 
+    - [ ] Use Electron to build actual save feature without download.
 - [ ] Ranged weapons - straight.
 - [ ] Calculate actual width of string for better data show
 

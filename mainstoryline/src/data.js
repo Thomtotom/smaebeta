@@ -1,16 +1,46 @@
 ﻿function loadData(){
 data = {
+    fullName: {
+        f: 'forest',
+        d: 'desert',
+        m: 'mountain',
+        u: 'unknown',
+    },
+    shortName: {
+        forest: 'f',
+        desert: 'd',
+        mountain: 'm',
+        unknown: 'u',
+    },
+    temples: {
+        desert: {wall: 'ss',contents: [['e',7],['st',7],['c',4],['ii',2],['gi',1],['sb',1]]},
+        mountain: {wall: 'mcs',contents: [['e',13],['px',1],['c',5],['gi',1],['ii',2],['lpx',1]]},
+        forest: {wall: 'mcs',contents: [['e',9],['st',7],['s',5],['gi',1],['ii',2],['fb',1]]},
+    },
+    biomeProb: {
+        forest: [['g',90],['tf',4.5],['r',4.5],['psp',1/3],['sfp',1/3],['mrp',1/3]],
+        desert: [['ds',199],['db',1]],
+    },
+    traps: {
+        tt: 30,
+    },
     maxClicks: {
         r: { def: 100, px: 50, ipx: 25 },
-        t4: { def: 200, x: 100, ix: 50 },
+        tf: { def: 200, x: 100, ix: 50 },
         io: { def: 300, px: 150, ipx: 75 },
         co: { def: 200, px: 100, ipx: 50 },
+        go: {def: 500, ipx: 100},
         ch: { def: 100, x: 50, ix: 25 },
         f: { def: 200, px: 100, ipx: 50 },
         nvp: { def: 200, px: 100, ipx: 50 },
         db: { def: 50, x: 25, ix: 12 },
         lp: { def: 50, x: 25, ix: 12 },
         ss: { def: 100, px: 50, ipx: 25},
+        psp: { def: 25},
+        mrp: { def: 25},
+        sfp: { def: 25},
+        mcs: { def: 100, px: 50, ipx: 25 },
+        tt: { def: 100, px: 50, ipx: 25 },
     },
     ms: {
         x: 1, px: 1, bx: 1, sw: 1, ix: 1, ipx: 1, ibx: 1, isw: 1, ih: 1, ic: 1, il: 1, ib: 1, sb: 1, lpx: 1, fb: 1
@@ -49,10 +79,11 @@ data = {
         [['ic', 1], [['ii', 15]], 'nvp'],
         [['il', 1], [['ii', 10]], 'nvp'],
         [['ib', 1], [['ii', 5]], 'nvp'],
+        [['gi',1],[['go',1],['c',1]], 'f'],
     ],  
     dropitem: {
         r: { def: ['s', [1, 1]] },
-        t4: { def: ['l', [4, 7]] },
+        tf: { def: ['l', [4, 7]] },
         lp: { def: ['l', [1, 1]] },
         fb: { def: ['fb', [1, 1]] },
         io: { def: ['', [0, 0]], px: ['io', [1, 1]], ipx: ['io', [1, 1]], lpx: ['ii', [1, 1] ] },
@@ -61,7 +92,13 @@ data = {
         nvp: { def: ['nv', [1, 1]] },
         ch: { def: ['ch', [1, 1]] },
         db: { def: ['st', [1, 3]] },
-        ss: {def: ['ss', [1, 1]]}
+        ss: {def: ['ss', [1, 1]]},
+        mrp: {def: ['mr',[1,1]]},
+        sfp: {def: ['sf',[1,1]]},
+        psp: {def: ['ps',[1,1]]},
+        go: {def: ['',[0,0]], ipx: ['go', [1, 1]], lpx: ['gi', [1, 1] ]},
+        mcs: {def: ['mcs',[1,1]]},
+        tt: {def: ['tt',[1,1]]},
     },
     defaultTile: {
         forest: 'g',
@@ -73,16 +110,18 @@ data = {
         ['ch', 'ch'],
         ['nv', 'nvp'],
         ['l', 'lp'],
-        ['ss','ss']
+        ['ss','ss'],
+        ['mcs','mcs'],
+        ['tt','tt'],
     ],
-    walkable: ['g', 'sr', 'ds', 'io', 'co', 'db'],
+    walkable: ['g', 'sr', 'ds', 'io', 'co', 'db','psp','mrp','sfp','go','tt'],
     blockimg: {
         g: [0, 0],
         cs: [1, 0],
         f: [2, 0],
         t: [3, 0],
         fb: [4, 0],
-        t4: [0, 1],
+        tf: [0, 1],
         r: [1, 1],
         sw: [2, 1],
         l: [3, 1],
@@ -116,6 +155,18 @@ data = {
         sb: [1, 7],
         dc: [2, 7],
         ss: [3, 7],
+        mrp: [4, 7],
+        mr: [0, 8],
+        psp: [1, 8],
+        ps: [2, 8],
+        sfp: [3, 8],
+        sf: [4, 8],
+        mc: [0,9],
+        go: [1,9],
+        gi: [2,9],
+        mcs: [3,9],
+        fc: [4,9],
+        tt: [0,10]
     },
     armor: {
         h: ['ih','e'],
@@ -141,6 +192,7 @@ data = {
     spawnpatch: {
         io: [200, [5, 12]],
         co: [300, [5, 20]],
+        go: [50, [3, 8]],
     },
     mobs: {
         blob: {
@@ -177,7 +229,7 @@ data = {
         ii: 'Iron ingot',
         ch: 'Chest*Placable*Stores items',
         isw: 'Iron sword*+7 damage',
-        ipx: 'Iron pickaxe*Mines even faster*+5 damage',
+        ipx: 'Iron pickaxe*Mines even faster*Can mine gold*+5 damage',
         ix: 'Iron axe*Cuts trees even faster*+6 damage',
         ibx: 'Iron battleaxe*+8 damage',
         nv: 'Anvil*Crafts iron tools',
@@ -189,7 +241,7 @@ data = {
         sb: 'Sandrunner boots*2x speed in desert',
         lpx: 'Lava pickaxe*Mines incredibly slowly*Smelts iron automatically*+3 damage',
         fb: 'Forest blade*+8 damage',
-        t4: 'Tree',
+        tf: 'Tree',
         g: 'Grass',
         r: 'Rock',
         sr: 'Stone',
@@ -199,7 +251,19 @@ data = {
         lp: 'Log',
         ss: 'Sandstone*Placable',
         dc: 'Crown of the desert*Summons the Sandcrawler',
-        nvp: 'Anvil'
+        nvp: 'Anvil',
+        sf: 'Sunflower',
+        sfp: 'Sunflower',
+        mr: 'Mushroom',
+        mrp: 'Mushroom',
+        psp: 'Pansy',
+        ps: 'Pansy',
+        mc: 'Crown of the mountains*Summons the Stonecrusher',
+        go: 'Gold ore',
+        gi: 'Gold ingot*Currency',
+        mcs: 'Mossy cobblestone',
+        fc: 'Crown of the forest*Summons the Treestalker',
+        tt: 'Temple trap',
     },
 };
 }

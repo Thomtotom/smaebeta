@@ -151,8 +151,10 @@
                 renderBlocks();
                 interact();
                 renderDrops();
-                renderPlayerArmor(renderPlayer(move()));
                 renMobs();
+                renderInHand();
+                getTrapped();
+                renderPlayerArmor(renderPlayer(move()));
                 renderHotbar();
                 renderHealth();
                 slotSwitch();
@@ -192,7 +194,7 @@
                 closeMap();
             } else if (screenNum == 4) {
                 renderDeath();
-            }
+            } 
         }
     </script>
     <script src='src/mob.js'></script>

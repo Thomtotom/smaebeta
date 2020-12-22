@@ -1,8 +1,36 @@
-﻿function loadTiles() {
+﻿function randomChoice(arr){
+    var ttl = 0;
+    for(var x in arr){
+        ttl += arr[x][1];
+    }
+    var nm = Math.random() * ttl, cc = 0;
+    for(var x in arr){
+        cc += arr[x][1];
+        if(nm < cc){
+            return arr[x][0];
+        }
+    }
+}
+function loadTiles() {
     generateBiomes();
     for (var o = 0; o < height; o++) {
         for (var j = 0; j < width; j++) {
-            blocks[o][j] = (o < 3 || o > 996 || j < 3 || j > 996) ? '' : (biomes[o * width + j] == 'forest' ? (Math.random() < 0.9 ? 'g' : (Math.random() < 0.5 ? 'r' : 't4')) : (biomes[o * width + j] == 'mountain' ? 'sr' : (Math.random() < 0.02 ? 'db' : 'ds')));
+            var randVal = Math.random();
+            if(o < 3 || o > 996 || j < 3 || j > 996){
+                blocks[o][j] = '';
+            } else {
+                switch(biomes[o * width + j]){
+                    case 'forest':
+                        blocks[o][j] = randomChoice(data.biomeProb.forest);
+                        break;
+                    case 'desert':
+                        blocks[o][j] = randomChoice(data.biomeProb.desert);
+                        break;
+                    case 'mountain': 
+                        blocks[o][j] = 'sr';
+                        break;
+                }
+            }
         }
     }
     for (p in data.spawnpatch) {
@@ -19,26 +47,35 @@
             }
         }
     }
-    for(var k = 0; k < 50; k++){
-        var tx = Math.floor(Math.random() * 987) + 3, ty = Math.floor(Math.random() * 987) + 3;
-        while (biomes[tx + width * ty] != 'desert') {
-            tx = Math.floor(Math.random() * 987) + 3;
-            ty = Math.floor(Math.random() * 987) + 3;
-        }
-        for(var q = 0; q < 49; q++){
-            if(q % 7 == 0 || q % 7 == 6 || Math.floor(q / 7) == 0 || Math.floor(q / 7) == 6 && (q != 21)){
-                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ss';
-            } else if(q == 26){
-                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ch';
-                chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = [];
-                for(var w = 0; w < 23; w++){
-                    chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push([Math.random() < 0.3 ? 'e' : (Math.random() < 0.7 ? (Math.random() < 0.7 ? 'st': 'c') : (Math.random() < 0.8 ? 'ii' : 'sb')),1]);
-                }
-                chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push(['dc',1]);
-            } else {
-                blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ds';
+    for(z in data.temples){
+        for(var k = 0; k < 50; k++){
+            var tx = Math.floor(Math.random() * 987) + 3, ty = Math.floor(Math.random() * 987) + 3;
+            while (biomes[tx + width * ty] != z) {
+                tx = Math.floor(Math.random() * 987) + 3;
+                ty = Math.floor(Math.random() * 987) + 3;
             }
-            biomes[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = 'desert';
+            for(var q = 0; q < 49; q++){
+                if(q % 7 == 0 || q % 7 == 6 || Math.floor(q / 7) == 0 || Math.floor(q / 7) == 6){
+                    blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = data.temples[z].wall;
+                } else if(q == 26){
+                    blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = 'ch';
+                    chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = [];
+                    for(var w = 0; w < 23; w++){
+                        var k = randomChoice(data.temples[z].contents);                       
+                        chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push([k,(k == 'e' ? 0 : 1)]);
+                    }
+                    chestContents[(ty + Math.floor(q / 7)) * width + tx + (q % 7)].push([data.shortName[z] + 'c',1]);
+                } else {
+                    blocks[ty + Math.floor(q / 7)][tx + (q % 7)] = data.defaultTile[z];
+                }
+                if(q == 21){
+                    blocks[ty + 3][tx] = data.defaultTile[z];
+                }
+                if(q == 22){
+                    blocks[ty + 3][tx + 1] = 'tt';
+                }
+                biomes[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = z;
+            }
         }
     }
     genMobs();
@@ -52,7 +89,7 @@ function generateBiomes() {
     ctx.fillStyle = 'green';
     ctx.fillRect(0, 0, 1000, 1000);
     for (var k = 0; k < 12; k++) {
-        var dx = Math.random() * 1000; dy = Math.random() * 1000;
+        var dx = Math.random() * 1000, dy = Math.random() * 1000;
         l = 200;
         ctx.beginPath();
         ctx.fillStyle = colors[k % colors.length];
