@@ -1,5 +1,5 @@
 ﻿function renderSave(){
-    myGameArea.context.drawImage(ime, 70, 210, 50, 50, 0, 0, 50, 50);
+    myGameArea.context.drawImage(ime, 70, 210, 50, 50,700 +  0, 0, 50, 50);
     if(myGameArea.click && myGameArea.x > 0 && myGameArea.x < 50 && myGameArea.y > 0 && myGameArea.y < 50){
         console.log(mobs);
         var sk = localStorage.getItem('secretKey') ?? Math.floor(Math.random() * 1000000000000);

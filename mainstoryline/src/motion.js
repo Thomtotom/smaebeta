@@ -1,7 +1,7 @@
 ﻿const CYCLE_LOOP = [0, 1, 2, 3, 4, 5];
 let currentDirection = 0, currentLoopIndex = 0, frameCount = 0, imgp = new Image();
 function drawFrame(frameX, frameY, canvasX, canvasY) {
-    myGameArea.context.drawImage(imgp, frameX * 32, frameY * 32, 32, 32, canvasX, canvasY, 96, 96);
+    myGameArea.context.drawImage(imgp, frameX * 32, frameY * 32, 32, 32,700 +  canvasX, canvasY, 96, 96);
 }
 function move() {
     var k = false;

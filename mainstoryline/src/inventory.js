@@ -1,10 +1,10 @@
-﻿function isNearby(x) {
+function isNearby(x) {
     if (x == 'none') {
         return true;
     } else {
         for (var qx = Math.floor(xpos) - 5; qx < Math.floor(xpos) + 5; qx++) {
             for (var qy = Math.floor(ypos) - 5; qy < Math.floor(ypos) + 5; qy++) {
-                if (qy >= 0 && qx >= 0) {
+                if (qy >= 0 && qx >= 0 && qy <= 999 && qx <= 999) {
                     if ((((xpos - qx) ** 2) + ((ypos - qy) ** 2)) ** (1 / 2) <= 5 && blocks[qy][qx] == x) {
                         return true;
                     }
@@ -20,40 +20,49 @@ function interact() {
         placabli.push(placable[e][0]);
     }
     if (myGameArea.keys && myGameArea.keys[32]) {
-        var k = true;
-        for (var o = 0; o < mobs.length; o++) {
-            if (((xpos - mobs[o].x) ** 2 + (ypos - mobs[o].y) ** 2) ** (1 / 2) < 1.5 && ((currentDirection == 1) ? (mobs[o].x >= xpos) : (mobs[o].x <= xpos))) {
-                k = false;
-                if (mobs[o].dmgc == 0) {
-                    mobs[o].dmgc = 12;
-                    mobs[o].h -= (data.dmg[inventory[selectIndex][0]] ?? data.dmg['def']);
-                    if (mobs[o].h <= 0) {
-                        dieMob(mobs[o]);
-                    } else {
-                        for (var p = 0; p < 100; p++) {
-                            dxMob((-2 * Math.cos(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
-                            dyMob((-2 * Math.sin(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
+        if(Object.keys(data.food).includes(inventory[selectIndex][0]) && healTimeout <= 0){
+            healTimeout = 60;
+            playerHealth += data.food[inventory[selectIndex][0]];
+            if(playerHealth > maxHealth){
+                playerHealth = maxHealth;
+            }
+            inventory[selectIndex][1]--;
+            clearBlanks();
+        } else {
+            var k = true;
+            for (var o = 0; o < mobs.length; o++) {
+                if (((xpos - mobs[o].x) ** 2 + (ypos - mobs[o].y) ** 2) ** (1 / 2) < 1.5 && ((currentDirection == 1) ? (mobs[o].x >= xpos) : (mobs[o].x <= xpos))) {
+                    k = false;
+                    if (mobs[o].dmgc == 0) {
+                        mobs[o].dmgc = 12;
+                        mobs[o].h -= (data.dmg[inventory[selectIndex][0]] ?? data.dmg['def']);
+                        if (mobs[o].h <= 0) {
+                            dieMob(mobs[o]);
+                        } else {
+                            for (var p = 0; p < 100; p++) {
+                                dxMob((-2 * Math.cos(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
+                                dyMob((-2 * Math.sin(Math.atan2(mobs[o].y - ypos, xpos - mobs[o].x))) / 100,mobs[o]);
+                            }
                         }
                     }
                 }
             }
-        }
-        if (k) {
-            if(myGameArea.keys[16] && blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] == 'ch'){
-                screenNum = 2;
-                openedWithChest = true;
-                invPage = 2;
-                cx = ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1));
-                cy = Math.round(ypos);
-            } else {
-                if (blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] == defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]]) {
-                    if (placabli.includes(inventory[selectIndex] ? (inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no') : 'no')) {
-                    blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = placable[placabli.indexOf(inventory[selectIndex][0])][1];
+            if (k) {
+                if(myGameArea.keys[16] && blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] == 'ch'){
+                    screenNum = 2;
+                    openedWithChest = true;
+                    invPage = 2;
+                    cx = ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1));
+                    cy = Math.round(ypos);
+                } else {
+                    if (blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] == defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]]) {
+                        if (placabli.includes(inventory[selectIndex] ? (inventory[selectIndex][0] ? inventory[selectIndex][0] : 'no') : 'no')) {
+                        blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = placable[placabli.indexOf(inventory[selectIndex][0])][1];
                         myGameArea.add(inventory[selectIndex][0], -1);
                     }
                 } else if (blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] != ''){
                     if (lastClick.x != ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) || lastClick.y != Math.round(ypos)) {
-                    clickCount = 1;
+                        clickCount = 1;
                     } else {
                         clickCount += 1;
                     } 
@@ -66,27 +75,28 @@ function interact() {
                                 var ng = Math.random() * Math.PI * 2;
                                 if(chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))][w][0] != 'e'){
                                     dropblocs.push({
-                                        item: chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))][w][0],
-                                        num: chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))][w][1],
-                                        xp: ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) + ((Math.random() ** (1/2)) * 2) * Math.cos(ng),
-                                        yp: Math.round(ypos) + ((Math.random() ** (1/2)) * 2) * Math.sin(ng)
-                                    });
-                                } 
+                                            item: chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))][w][0],
+                                            num: chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))][w][1],
+                                            xp: ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) + ((Math.random() ** (1/2)) * 2) * Math.cos(ng),
+                                            yp: Math.round(ypos) + ((Math.random() ** (1/2)) * 2) * Math.sin(ng)
+                                        });
+                                    } 
+                                }
+                                chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = undefined;
                             }
-                            chestContents[(Math.round(ypos) * width) + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = undefined;
+                            var ng = Math.random() * Math.PI * 2;
+                            dropblocs.push({
+                                item: dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][0],
+                                num: Math.floor(Math.random() * (dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][1] - dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0] + 1)) + dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0],
+                                xp: ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) + ((Math.random() ** (1/2)) * 1) * Math.cos(ng),
+                                yp: Math.round(ypos) + ((Math.random() ** (1/2)) * 1) * Math.sin(ng)
+                            });
+                            blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]];
                         }
-                        var ng = Math.random() * Math.PI * 2;
-                        dropblocs.push({
-                            item: dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][0],
-                            num: Math.floor(Math.random() * (dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][1] - dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0] + 1)) + dropitem[blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]][dq][1][0],
-                            xp: ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) + ((Math.random() ** (1/2)) * 1) * Math.cos(ng),
-                            yp: Math.round(ypos) + ((Math.random() ** (1/2)) * 1) * Math.sin(ng)
-                        });
-                        blocks[Math.round(ypos)][((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))] = defaultTile[biomes[Math.round(ypos) * width + ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1))]];
+                        lastClick.x = ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1));
+                        lastClick.y = Math.round(ypos);
+                        myGameArea.context.drawImage(imc,32 *  Math.floor(10 * (clickCount / mq)), 0, 32, 32,700 +  ((        (currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) - xpos + (3 + 14/96)) *   96, (Math.round(ypos) - ypos + (3 + 14/96)) * 96, 96, 96);
                     }
-                    lastClick.x = ((currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1));
-                    lastClick.y = Math.round(ypos);
-                    myGameArea.context.drawImage(imc,32 *  Math.floor(10 * (clickCount / mq)), 0, 32, 32, ((        (currentDirection == 1) ? (Math.ceil(xpos) + 1) : (Math.floor(xpos) - 1)) - xpos + (3 + 14/96)) *   96, (Math.round(ypos) - ypos + (3 + 14/96)) * 96, 96, 96);
                 }
             }
         }

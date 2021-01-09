@@ -3,24 +3,25 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        canvas {
+        #canvas {
             background-color: #f1f1f1;
-            height: 98vh;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
+            display: block;
+            position: absolute;
         }
 
-        * {
-            margin: 0px;
-            padding: 0px;
+        #canvas,body {
+            margin: 0;
+            padding: 0;
+            pointer-events:none;
+            overflow: hidden;
         }
     </style>
 </head>
 <body onload="startGame()">
-    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000, invPage = 0, openedWithChest = false, equipped = { h: ['e', ''], c: ['e',''],l: ['e',''],b: ['e','']}, chestContents = {}, cx = 0, cy = 0, datashow = false, data;
+    <script>var maxClicks, recipes, dropitem, defaultTile, placable, speed = 0.0625, count = 31, dropblocs = [], invIndex = -1, walkable, blocks = [], screenNum = 0, biomes = [], inventory = [], selectIndex = 0, xpos = 500, ypos = 500, height = 1000, width = 1000, blockimg, lastClick = { x: -1, y: -1 }, clickCount = 1, bImage = new Image(), cs = document.createElement("CANVAS"), map = [], mapview = [], playerHealth = 20, maxHealth = 20, regenCount = 0, dmgcount = 0, pagenum = 0, pages = 1, mobs = [], spawnx = 500, spawny = 500, deathX = -1000, deathY = -1000, invPage = 0, openedWithChest = false, equipped = { h: ['e', ''], c: ['e',''],l: ['e',''],b: ['e','']}, chestContents = {}, cx = 0, cy = 0, datashow = false, data, healTimeout = 0;
         bImage.src = 'imgs/index wp.png';
         function startGame() {
+            onResize();
             loadData();
             for (var i = 0; i < height; i++) {
                 blocks[i] = [];
@@ -93,8 +94,8 @@
                 }
             },
             start: function () {
-                document.getElementById("canvas").width = 700;
                 document.getElementById("canvas").height = 700;
+                document.getElementById('canvas').width = 2100;
                 this.context = document.getElementById("canvas").getContext("2d");
                 imgp.src = 'imgs/player.png';
                 imgp.onload = function () {
@@ -108,34 +109,18 @@
                     myGameArea.keys[e.keyCode] = (e.type == "keydown");
                 });
                 window.addEventListener('mousedown', function (e) {
-                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
-                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.x = (e.clientX - (window.innerWidth - (3 * window.innerHeight)) / 2) * 700 / window.innerHeight - 700;
+                    myGameArea.y = e.clientY * 700 / window.innerHeight;
                     myGameArea.click = true;
                 });
                 window.addEventListener('mousemove', function (e) {
-                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
-                    myGameArea.ax = e.clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.ay = e.clientY * 70000 / (98 * window.innerHeight);
+                    myGameArea.x = (e.clientX - (window.innerWidth - (3 * window.innerHeight)) / 2) * 700 / window.innerHeight - 700;
+                    myGameArea.y = e.clientY * 700 / window.innerHeight;
                 });
                 window.addEventListener('mouseup', function (e) {
                     myGameArea.x = false;
                     myGameArea.y = false;
                     myGameArea.click = false;
-                });
-                window.addEventListener('touchstart', function (e) {
-                    myGameArea.x = e.clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.y = e.clientY * 70000 / (98 * window.innerHeight);
-                });
-                window.addEventListener('touchmove', function (e) {
-                    myGameArea.x = e.touches[0].clientX * 70000 / (98 * window.innerHeight);
-                    myGameArea.y = e.touches[0].clientY * 70000 / (98 * window.innerHeight);
-                });
-                window.addEventListener('touchend', function (e) {
-                    myGameArea.x = false;
-                    myGameArea.y = false;
                 });
             },
             clear: function () {
@@ -153,15 +138,14 @@
                 renderDrops();
                 renMobs();
                 renderInHand();
-                getTrapped();
                 renderPlayerArmor(renderPlayer(move()));
                 renderHotbar();
                 renderHealth();
                 slotSwitch();
-                updateMap();
                 openMap();
                 throwItems();
                 renderData();
+                renderHealTimeout();
                 if (myGameArea.keys && (myGameArea.keys[69] || myGameArea.keys[101])) {
                     screenNum = 2;
                     myGameArea.keys[101] = false;
@@ -171,7 +155,7 @@
                 }
             } else if (screenNum == 2) {
                 myGameArea.context.fillStyle = '#000066';
-                myGameArea.context.fillRect(0, 0, 700, 700);
+                myGameArea.context.fillRect(0, 0,2100, 700);
                 closeInventory();
                 renderItems();
                 clearBlanks();
@@ -196,6 +180,12 @@
                 renderDeath();
             } 
         }
+        function onResize(){
+            document.getElementById('canvas').style.width = (3 * window.innerHeight) + 'px';
+            document.getElementById('canvas').style.height = window.innerHeight + 'px';
+            document.getElementById('canvas').style.left = (window.innerWidth - (3 * window.innerHeight)) / 2 + 'px';
+        }
+        window.onresize = () => {onResize()}
     </script>
     <script src='src/mob.js'></script>
     <script src='src/data.js'></script>

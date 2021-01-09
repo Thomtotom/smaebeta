@@ -1,6 +1,7 @@
 ﻿function openMap() {
     if (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109])) {
         screenNum = 3;
+        updateMap();
         myGameArea.keys[109] = false;
         myGameArea.keys[77] = false;
         mapview = [];
@@ -30,15 +31,17 @@
     }
 }
 function renderMap() {
+    myGameArea.context.fillStyle = 'black';
+    myGameArea.context.fillRect(0,0,2100,700)
     for (var x = 0; x < 10000; x++) {
         myGameArea.context.fillStyle = mapview[x] == 'unknown' ? 'black' : (mapview[x] == 'desert' ? '#ffff99' : (mapview[x] == 'forest' ? 'green' : 'grey'));
-        myGameArea.context.fillRect((x % 100) * 7, Math.floor(x / 100) * 7, 7, 7);
+        myGameArea.context.fillRect(700 + (x % 100) * 7, Math.floor(x / 100) * 7, 7, 7);
     }
     myGameArea.context.fillStyle = 'red';
-    myGameArea.context.fillRect(xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
+    myGameArea.context.fillRect(700 + xpos * 0.7 - 5, ypos * 0.7 - 5, 10, 10);
 }
 function closeMap() {
-    myGameArea.context.drawImage(ime, 70, 70, 50, 50, 650, 0, 50, 50);
+    myGameArea.context.drawImage(ime, 70, 70, 50, 50,700 +  650, 0, 50, 50);
     if ((myGameArea.click && myGameArea.x > 650 && myGameArea.x < 700 && myGameArea.y < 50) || (myGameArea.keys && (myGameArea.keys[77] || myGameArea.keys[109]))) {
         screenNum = 1;
         myGameArea.keys[109] = false;

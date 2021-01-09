@@ -1,8 +1,13 @@
-﻿function mob(name) {
-    this.x = Math.floor(Math.random() * 994) + 3; this.y = Math.floor(Math.random() * 994) + 3;
-    while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
-        this.x = Math.floor(Math.random() * 994) + 3;
-        this.y = Math.floor(Math.random() * 994) + 3;
+function mob(name) {
+    if(data.setPos.includes(name)){
+        this.x = arguments[1];
+        this.y = arguments[2];
+    } else {
+        this.x = Math.floor(Math.random() * 994) + 3; this.y = Math.floor(Math.random() * 994) + 3;
+        while (biomes[this.y * width + this.x] != data.mobs[name].spawn) {
+            this.x = Math.floor(Math.random() * 994) + 3;
+            this.y = Math.floor(Math.random() * 994) + 3;
+        }
     }
     this.h = data.mobs[name].health;
     this.dmgc = 0;
@@ -56,7 +61,7 @@ function renMobs() {
 function renderMob(mob){
     if (mob.ch) {
         moveMob(mob);
-        if ((mob.x - xpos + (3 + 14/96)) * 96 < 850 && (mob.y - ypos + (3 + 14/96)) * 96 < 850 && (mob.x - xpos + (3 + 14/96)) * 96 > -150 && (mob.y - ypos + (3 + 14/96)) * 96 > -150) {
+        if ((mob.x - xpos + (3 + 14/96)) * 96 < 1600 && (mob.y - ypos + (3 + 14/96)) * 96 < 850 && (mob.x - xpos + (3 + 14/96)) * 96 > -800 && (mob.y - ypos + (3 + 14/96)) * 96 > -150) {
             mob.fc++;
             if (mob.fc == data.mobs[mob.name].framerate) {
                 mob.fc = 0;
@@ -68,15 +73,15 @@ function renderMob(mob){
             if (mob.dmgc > 0) {
                 mob.dmgc--;
                 if (mob.ng > Math.PI * 3 / 2 || mob.ng < Math.PI / 2) {
-                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['dr'], 32, 32, (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96);
+                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['dr'], 32, 32,700 +  (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96);
                 } else {
-                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['dl'], 32, 32, (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96);
+                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['dl'], 32, 32,700 +  (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96);
                 }
             } else {
                 if (mob.ng > Math.PI * 3 / 2 || mob.ng < Math.PI / 2) {
-                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['r'], 32, 32, (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96)
+                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['r'], 32, 32,700 +  (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96)
                 } else {
-                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['l'], 32, 32, (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96)
+                    myGameArea.context.drawImage(imm, 32 * data.mobs[mob.name].cycleLoop[mob.fi], 32 * data.mobs[mob.name].get['l'], 32, 32,700 +  (mob.x - xpos + (3 + 14/96)) * 96, (mob.y - ypos + (3 + 14/96)) * 96, 96, 96)
                 }
             }
         }
@@ -91,7 +96,7 @@ function moveMob(mob){
         }
     }
     if (data.mobs[mob.name].type == 'hostile') {
-        if ((((mob.x - xpos) ** 2) + ((mob.y - ypos) ** 2)) ** (1 / 2) < 5) {
+        if ((((mob.x - xpos) ** 2) + ((mob.y - ypos) ** 2)) ** (1 / 2) < 10) {
             mob.ng = Math.atan2(mob.y - ypos, xpos - mob.x);
         } else {
             mob.ac++;

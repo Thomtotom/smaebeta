@@ -1,4 +1,4 @@
-﻿function randomChoice(arr){
+function randomChoice(arr){
     var ttl = 0;
     for(var x in arr){
         ttl += arr[x][1];
@@ -48,7 +48,7 @@ function loadTiles() {
         }
     }
     for(z in data.temples){
-        for(var k = 0; k < 50; k++){
+        for(var u = 0; u < 50; u++){
             var tx = Math.floor(Math.random() * 987) + 3, ty = Math.floor(Math.random() * 987) + 3;
             while (biomes[tx + width * ty] != z) {
                 tx = Math.floor(Math.random() * 987) + 3;
@@ -71,11 +71,9 @@ function loadTiles() {
                 if(q == 21){
                     blocks[ty + 3][tx] = data.defaultTile[z];
                 }
-                if(q == 22){
-                    blocks[ty + 3][tx + 1] = 'tt';
-                }
                 biomes[(ty + Math.floor(q / 7)) * width + tx + (q % 7)] = z;
             }
+            mobs.push(new mob('g',tx + 3, ty + 3));
         }
     }
     genMobs();
