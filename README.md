@@ -1,7 +1,8 @@
 # SMAEBETA
 https://smae.surge.sh
 ## Bug list:
-- [x] All known bugs fixed
+- [ ] Desert temple chest have pickaxe background instead of sand - investigate...
+- [ ] Deleted item slots remain selected. Disable. 
 ## To do:
 - [ ] Better art for:
   * Gel / torch items
